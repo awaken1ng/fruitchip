@@ -1,3 +1,6 @@
 [submodule "sdk"]
 	path = sdk
 	url = https://github.com/raspberrypi/pico-sdk
+[submodule "ps2bbl"]
+	path = ps2bbl
+	url = https://github.com/israpps/PlayStation2-Basic-BootLoader.git
