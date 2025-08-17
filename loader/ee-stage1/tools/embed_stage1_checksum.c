@@ -7,8 +7,6 @@
 
 #define CHECK_SECTION_SIZE 4
 
-uint8_t EMPTY[CHECK_SECTION_SIZE] = {0, 0, 0, 0};
-
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -25,6 +23,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
 
     unsigned long file_size = ftell(fd);
+    uint16_t file_size_u16 = (uint16_t)file_size - CHECK_SECTION_SIZE;
     if (file_size > 0x62C)
     {
         printf("Error: stage 1 payload is too big");
@@ -38,12 +37,11 @@ int main(int argc, char *argv[])
     if (fseek(fd, 0, SEEK_SET) != 0)
         exit(EXIT_FAILURE);
 
-    unsigned int read = fread(file_buffer, sizeof(uint8_t), file_size - CHECK_SECTION_SIZE, fd);
-    if (read != file_size - CHECK_SECTION_SIZE)
+    unsigned int read = fread(file_buffer, sizeof(uint8_t), file_size_u16, fd);
+    if (read != file_size_u16)
         exit(EXIT_FAILURE);
 
     // embed file size and checksum at the end, sections `.size` and `.checksum` in linker file
-    uint16_t file_size_u16 = (uint16_t)file_size - CHECK_SECTION_SIZE;
     uint16_t checksum = fletcher16(file_buffer, file_size_u16);
 
     if (fwrite(&file_size_u16, sizeof(file_size_u16), 1, fd) != 1)

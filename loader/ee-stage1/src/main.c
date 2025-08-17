@@ -10,18 +10,17 @@ static u16 __attribute__((section(".checksum"))) EE_STAGE_1_CHECKSUM;
 void __attribute__((section(".entry"))) __start()
 {
     u16 checksum = fletcher16((void *)EE_STAGE_1_ADDR, EE_STAGE_1_SIZE);
-    if (checksum == EE_STAGE_1_CHECKSUM) {
+    if (checksum == EE_STAGE_1_CHECKSUM)
         sio_puts("EE1: self-check ok");
-    } else {
+    else
         sio_puts("EE1: self-check bad");
-    }
 
     u32 try = 0;
     while (true)
     {
         if (try > 32)
         {
-            sio_puts("EE1: read: hit retry limit");
+            sio_puts("EE1: hit retry limit");
             asm volatile("break\n");
         }
 

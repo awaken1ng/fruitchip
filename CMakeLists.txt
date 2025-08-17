@@ -18,10 +18,13 @@ pico_sdk_init()
 
 add_executable(my_project
     src/main.c
+    src/dma.c
+    src/boot_rom_read_handler.c
+    src/boot_rom_write_handler.c
 )
 
 pico_generate_pio_header(my_project
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/boot_rom_passive_reader.pio
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/boot_rom.pio
 )
 
 # region: loader
