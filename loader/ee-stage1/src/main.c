@@ -7,8 +7,13 @@
 static u16 __attribute__((section(".size"))) EE_STAGE_1_SIZE;
 static u16 __attribute__((section(".checksum"))) EE_STAGE_1_CHECKSUM;
 
-void __attribute__((section(".entry"))) __start()
+void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int argc, char** argv)
 {
+    (void)entry; // 0x200000
+    (void)gp; // NULL
+    (void)argc; // 1
+    (void)argv; // rom0:OSDSYS
+
     u16 checksum = fletcher16((void *)EE_STAGE_1_ADDR, EE_STAGE_1_SIZE);
     if (checksum == EE_STAGE_1_CHECKSUM)
         sio_puts("EE1: self-check ok");
