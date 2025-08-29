@@ -3,44 +3,36 @@
 .define PUBLIC BOOT_ROM_DATA_OUT_SM 2
 .define PUBLIC BOOT_ROM_DATA_PINDIRS_SWITCHER_SM 3
 
-.define PUBLIC BOOT_ROM_Q0_PIN 2
-.define PUBLIC BOOT_ROM_Q1_PIN 3
-.define PUBLIC BOOT_ROM_Q2_PIN 4
-.define PUBLIC BOOT_ROM_Q3_PIN 5
-.define PUBLIC BOOT_ROM_Q4_PIN 6
-.define PUBLIC BOOT_ROM_Q5_PIN 7
-.define PUBLIC BOOT_ROM_Q6_PIN 8
-.define PUBLIC BOOT_ROM_Q7_PIN 9
-.define PUBLIC BOOT_ROM_CE_PIN 10
-.define PUBLIC BOOT_ROM_OE_PIN 11
+.define PUBLIC BOOT_ROM_BYTE_OUT_IRQ 0
+.define PUBLIC BOOT_ROM_DATA_IN_PAUSED_IRQ 4
+.define PUBLIC BOOT_ROM_DATA_OUT_PAUSED_IRQ 5
 
-.define PUBLIC BYTE_OUT_IRQ 0
-.define PUBLIC DATA_IN_PAUSED_IRQ 4
-.define PUBLIC DATA_OUT_PAUSED_IRQ 5
+// MX29LV320E is used in a boot rom replacement flex board, so it appears to be compatible
 
 .program boot_rom_read_sniffer
 ce_high:
-    wait 0 irq DATA_IN_PAUSED_IRQ
-    wait 0 gpio BOOT_ROM_OE_PIN [5] // 20.83 ns @ 240 MHz
+    wait 0 irq BOOT_ROM_DATA_IN_PAUSED_IRQ
+    wait 0 gpio ${BOOT_ROM_OE_PIN} [5] // 20.83 ns @ 240 MHz
     jmp pin ce_high
 ce_low:
     in pins, 8
-    wait 1 gpio BOOT_ROM_OE_PIN
+    wait 1 gpio ${BOOT_ROM_OE_PIN}
 // 5 instructions
 
 // watching writes on a ROM, you may ask,
 // writing into BOOT ROM area will still result
 // in write command being send over the wire,
 // IC will reject it, but we can observe it.
+//
 // multiple writes one after the other
 // will end up holding CE low the entire time.
 // since we don't have WE wired up,
 // we can only see the last byte.
 .program boot_rom_write_sniffer
 start:
-    wait 0 irq DATA_IN_PAUSED_IRQ
-    wait 1 gpio BOOT_ROM_CE_PIN
-    wait 0 gpio BOOT_ROM_CE_PIN [3] // 12.5 ns @ 240 MHz
+    wait 0 irq BOOT_ROM_DATA_IN_PAUSED_IRQ
+    wait 1 gpio ${BOOT_ROM_CE_PIN}
+    wait 0 gpio ${BOOT_ROM_CE_PIN} [3] // 12.5 ns @ 240 MHz
     jmp pin oe_high
 oe_low:
     // read command, ignore
@@ -52,27 +44,26 @@ oe_high:
 .program boot_rom_data_out
 start:
     pull ifempty block
-    wait 0 irq DATA_OUT_PAUSED_IRQ
-    wait 0 gpio BOOT_ROM_OE_PIN
+    wait 0 irq BOOT_ROM_DATA_OUT_PAUSED_IRQ
+    wait 0 gpio ${BOOT_ROM_OE_PIN}
     jmp pin start
     out pins, 8
-    wait 1 gpio BOOT_ROM_OE_PIN [10] // 41.66ns @ 240 MHz, match the delay on pindirs switcher, +1 cycle just in case to make sure IRQ is set
-    wait 0 irq BYTE_OUT_IRQ
+    wait 1 gpio ${BOOT_ROM_OE_PIN} [10] // 41.66ns @ 240 MHz, match the delay on pindirs switcher, +1 cycle just in case to make sure IRQ is set
+    wait 0 irq BOOT_ROM_BYTE_OUT_IRQ
 // 7 instructions
 
-// MX29LV320E is probably not the exact chip used by PS2, but it appears to be compatible
 .program boot_rom_data_pindirs_switcher
 .side_set 1 opt
     mov osr !null
 ce_high:
-    wait 0 irq DATA_OUT_PAUSED_IRQ
-    wait 0 gpio BOOT_ROM_OE_PIN
+    wait 0 irq BOOT_ROM_DATA_OUT_PAUSED_IRQ
+    wait 0 gpio ${BOOT_ROM_OE_PIN}
     jmp pin ce_high
     out pindirs, 8 side 1           // set OUT (Q0-Q7) to 1 (output), SIDE (LED) to 1 (on)
     mov osr null
-    wait 1 gpio BOOT_ROM_OE_PIN [7] // 29.16ns @ 240 MHz, hold the data for a bit after rising edge
-    out pindirs, 8 side 0           // set OUT (Q0-Q7) to 0 (high impedance), SIDE to 0 (off)
-    irq wait BYTE_OUT_IRQ
+    wait 1 gpio ${BOOT_ROM_OE_PIN} [7] // 29.16ns @ 240 MHz, hold the data for a bit after rising edge
+    out pindirs, 8 side 0           // set OUT (Q0-Q7) to 0 (high impedance), SIDE (LED) to 0 (off)
+    irq wait BOOT_ROM_BYTE_OUT_IRQ
 // 9 instructions
 
 // 27 instructions used, 5 remaining
@@ -83,11 +74,6 @@ static const uint8_t boot_rom_write_sniffer_program_instructions_count = sizeof(
 static const uint8_t boot_rom_data_out_program_instructions_count = sizeof(boot_rom_data_out_program_instructions) / sizeof(*boot_rom_data_out_program_instructions);
 static const uint8_t boot_rom_data_pindirs_switcher_program_instructions_count = sizeof(boot_rom_data_pindirs_switcher_program_instructions) / sizeof(*boot_rom_data_pindirs_switcher_program_instructions);
 
-static const uint8_t boot_rom_instructions_total = boot_rom_read_sniffer_program_instructions_count
-    + boot_rom_write_sniffer_program_instructions_count
-    + boot_rom_data_out_program_instructions_count
-    + boot_rom_data_pindirs_switcher_program_instructions_count;
-
 // calculate offsets statically to help avoid runtime calculations
 static const uint8_t boot_rom_read_sniffer_offset = 32 - boot_rom_read_sniffer_program_instructions_count;
 static const uint8_t boot_rom_write_sniffer_offset = boot_rom_read_sniffer_offset - boot_rom_write_sniffer_program_instructions_count;
@@ -96,16 +82,16 @@ static const uint8_t boot_rom_data_pindirs_switcher_offset = boot_rom_data_out_o
 
 static inline void boot_rom_pio_gpio_init(PIO pio)
 {
-    pio_gpio_init(pio, BOOT_ROM_Q0_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q1_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q2_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q3_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q4_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q5_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q6_PIN);
-    pio_gpio_init(pio, BOOT_ROM_Q7_PIN);
-    pio_gpio_init(pio, BOOT_ROM_CE_PIN);
-    pio_gpio_init(pio, BOOT_ROM_OE_PIN);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 0);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 1);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 2);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 3);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 4);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 5);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 6);
+    pio_gpio_init(pio, ${BOOT_ROM_Q0_PIN} + 7);
+    pio_gpio_init(pio, ${BOOT_ROM_CE_PIN});
+    pio_gpio_init(pio, ${BOOT_ROM_OE_PIN});
 }
 
 static inline void boot_rom_read_sniffer_init_and_start(PIO pio, uint sm, uint offset)
@@ -114,15 +100,15 @@ static inline void boot_rom_read_sniffer_init_and_start(PIO pio, uint sm, uint o
 
     pio_sm_config cfg = boot_rom_read_sniffer_program_get_default_config(offset);
 
-    sm_config_set_in_pins(&cfg, BOOT_ROM_Q0_PIN);
+    sm_config_set_in_pins(&cfg, ${BOOT_ROM_Q0_PIN});
     sm_config_set_in_shift(&cfg, false, true, 8); /* shift ISR to left, autopush every 8 bits */
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_RX);
 
-    sm_config_set_jmp_pin(&cfg, BOOT_ROM_CE_PIN);
+    sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_CE_PIN});
 
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_Q0_PIN, 8, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_CE_PIN, 1, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_OE_PIN, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
 
     pio_sm_init(pio, sm, offset, &cfg);
     pio_sm_set_enabled(pio, sm, true);
@@ -134,15 +120,15 @@ static inline void boot_rom_write_sniffer_init_and_start(PIO pio, uint sm, uint 
 
     pio_sm_config cfg = boot_rom_write_sniffer_program_get_default_config(offset);
 
-    sm_config_set_in_pins(&cfg, BOOT_ROM_Q0_PIN);
+    sm_config_set_in_pins(&cfg, ${BOOT_ROM_Q0_PIN});
     sm_config_set_in_shift(&cfg, false, true, 8); /* shift ISR to left, autopush every 8 bits */
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_RX);
 
-    sm_config_set_jmp_pin(&cfg, BOOT_ROM_OE_PIN);
+    sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_OE_PIN});
 
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_Q0_PIN, 8, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_CE_PIN, 1, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_OE_PIN, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
 
     pio_sm_init(pio, sm, offset, &cfg);
     pio_sm_set_enabled(pio, sm, true);
@@ -155,18 +141,18 @@ static inline void boot_rom_data_pindirs_switcher_init_and_start(PIO pio, uint s
 
     pio_sm_config cfg = boot_rom_data_pindirs_switcher_program_get_default_config(offset);
 
-    sm_config_set_out_pins(&cfg, BOOT_ROM_Q0_PIN, 8);
+    sm_config_set_out_pins(&cfg, ${BOOT_ROM_Q0_PIN}, 8);
     sm_config_set_out_shift(&cfg, true, true, 8); /* shift OSR to left, autopull every 8 bits */
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_TX);
 
-    sm_config_set_jmp_pin(&cfg, BOOT_ROM_CE_PIN);
+    sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_CE_PIN});
 
     // set LED pin as side pin to show read activity
     sm_config_set_sideset_pin_base(&cfg, PICO_DEFAULT_LED_PIN);
 
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_Q0_PIN, 8, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_CE_PIN, 1, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_OE_PIN, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
     pio_sm_set_consecutive_pindirs(pio, sm, PICO_DEFAULT_LED_PIN, 1, GPIO_OUT);
 
     pio_sm_init(pio, sm, offset, &cfg);
@@ -179,17 +165,17 @@ static inline void boot_rom_data_out_init_and_start(PIO pio, uint sm, uint offse
 
     pio_sm_config cfg = boot_rom_data_out_program_get_default_config(offset);
 
-    sm_config_set_out_pins(&cfg, BOOT_ROM_Q0_PIN, 8);
+    sm_config_set_out_pins(&cfg, ${BOOT_ROM_Q0_PIN}, 8);
     sm_config_set_out_special(&cfg, true, false, false); // set sticky output, we need to hold data until rising edge
     sm_config_set_out_shift(&cfg, true, false, 8); // shift OSR to left, no autopull, 8 bits threshold
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_TX);
 
-    sm_config_set_jmp_pin(&cfg, BOOT_ROM_CE_PIN);
+    sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_CE_PIN});
 
     // start data pins in input, `boot_rom_data_pindirs_switcher` will switch direction as needed
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_Q0_PIN, 8, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_CE_PIN, 1, GPIO_IN);
-    pio_sm_set_consecutive_pindirs(pio, sm, BOOT_ROM_OE_PIN, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
+    pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
 
     pio_sm_init(pio, sm, offset, &cfg);
     pio_sm_set_enabled(pio, sm, true);

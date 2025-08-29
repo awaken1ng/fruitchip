@@ -1,5 +1,5 @@
 #include "boot_rom_read_handler.h"
-#include "dma.h"
+#include "boot_rom_data_out.h"
 
 // OSDSYS patch that launches stage 2
 const uint8_t __not_in_flash("ee_stage1") LOADER_EE_STAGE_1[] = {

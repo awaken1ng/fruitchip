@@ -1,0 +1,70 @@
+#pragma once
+
+#include <stdint.h>
+#include <string.h>
+
+#include <hardware/regs/addressmap.h>
+
+#include "boot_rom_data_out.h"
+
+#define APPS_PARTITION_MAGIC1 "APPS"
+#define APPS_PARTITION_MAGIC2 0x4FB80AB4
+#define APPS_PARTITION_VERSION 1
+
+// struct Entry {
+//     u32 data_len;
+//     u32 attrs;
+//     u8 data[len];
+//     u32 crc32;
+// };
+//
+// struct LookupEntry {
+//     u32 *offset: Entry;
+//     u32 entry_len;
+// };
+//
+// struct Apps {
+//     u32 magic1;
+//     u32 magic2;
+//     u32 version;
+//     u32 entries_count;
+//     LookupEntry lookup[entries_count];
+//     Entry entries[entries_count];
+// };
+
+inline static bool apps_partition_detect()
+{
+    bool is_magic1_valid = memcmp((void *)APPS_PARTITION_OFFSET, APPS_PARTITION_MAGIC1, sizeof(uint32_t)) == 0;
+    if (!is_magic1_valid) return false;
+
+    bool is_magic2_valid = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x4) == APPS_PARTITION_MAGIC2;
+    if (!is_magic2_valid) return false;
+
+    bool is_version_valid = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x8) == APPS_PARTITION_VERSION;
+    if (!is_version_valid) return false;
+
+    return true;
+}
+
+inline static uint32_t apps_partition_entries_count()
+{
+    return *(uint32_t *)(APPS_PARTITION_OFFSET + 0xC);
+}
+
+inline static uint8_t *apps_partition_entry_addr(uint32_t idx)
+{
+    uint32_t offset = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x10 + (idx * 2 * sizeof(uint32_t)));
+    return (uint8_t *)offset;
+}
+
+inline static uint32_t apps_partition_entry_length(uint32_t idx)
+{
+    return *(uint32_t *)(APPS_PARTITION_OFFSET + 0x14 + (idx * 2 * sizeof(uint32_t)));
+}
+
+inline static void apps_partition_start_entry_data_out(uint32_t entry_idx)
+{
+    uint8_t *addr = apps_partition_entry_addr(entry_idx);
+    uint32_t len = apps_partition_entry_length(entry_idx);
+    boot_rom_data_out_start(addr, len);
+}

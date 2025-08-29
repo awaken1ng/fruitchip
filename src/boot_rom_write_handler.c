@@ -1,12 +1,12 @@
 #include "boot_rom_write_handler.h"
-#include "dma.h"
+#include "boot_rom_data_out.h"
 
 // ELF loader that launches stage 3 ELF
-const uint8_t __not_in_flash("ee_stage2") LOADER_EE_STAGE_2[] = {
+const uint8_t __in_flash("ee_stage2") LOADER_EE_STAGE_2[] = {
     #embed "../loader/ee-stage2/bin/ee-stage2.bin"
 };
 
-const uint8_t __not_in_flash("ee_stage3") LOADER_EE_STAGE_3[] = {
+const uint8_t __in_flash("ee_stage3") LOADER_EE_STAGE_3[] = {
     #embed "../ps2bbl/bin/COMPRESSED_PS2BBL.ELF"
 };
 
@@ -16,13 +16,13 @@ void (*write_handler)(uint8_t) = &handle_write_idle;
 
 void __time_critical_func(handle_write_payload_ee_stage3)(uint8_t w)
 {
-    if (w == 0xCC) dma_data_out_start_transfer(LOADER_EE_STAGE_3, sizeof(LOADER_EE_STAGE_3));
+    if (w == 0xCC) boot_rom_data_out_start(LOADER_EE_STAGE_3, sizeof(LOADER_EE_STAGE_3));
     write_handler = &handle_write_idle;
 }
 
 void __time_critical_func(handle_write_payload_ee_stage2)(uint8_t w)
 {
-    if (w == 0xCB) dma_data_out_start_transfer(LOADER_EE_STAGE_2, sizeof(LOADER_EE_STAGE_2));
+    if (w == 0xCB) boot_rom_data_out_start(LOADER_EE_STAGE_2, sizeof(LOADER_EE_STAGE_2));
     write_handler = &handle_write_idle;
 }
 
