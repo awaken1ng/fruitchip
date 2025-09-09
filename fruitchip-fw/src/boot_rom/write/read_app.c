@@ -3,6 +3,7 @@
 #include "read_app.h"
 #include "apps.h"
 #include <modchip/errno.h>
+#include <modchip/cmd.h>
 #include <boot_rom/handler.h>
 #include "idle.h"
 
@@ -19,9 +20,9 @@ void __time_critical_func(handle_write_read_apps_partition)(uint8_t w)
     counter += 1;
 
     switch (counter) {
-        case 1: if (w != 0x22) { goto exit; } break;
-        case 2: if (w != 0x6c) { goto exit; } break;
-        case 3: if (w != 0x0a) { goto exit; } break;
+        case 1: if (w != GET_BYTE(MODCHIP_CMD_READ_APP, 1)) { goto exit; } break;
+        case 2: if (w != GET_BYTE(MODCHIP_CMD_READ_APP, 2)) { goto exit; } break;
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_READ_APP, 3)) { goto exit; } break;
 
         case 4: read_offset = w; break;
         case 5: read_offset |= w << 8; break;

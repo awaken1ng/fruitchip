@@ -5,6 +5,7 @@
 #include <boot_rom/data_out.h>
 #include "idle.h"
 #include <modchip/errno.h>
+#include <modchip/cmd.h>
 
 bool disable_next_osdsys_hook = false;
 
@@ -13,9 +14,9 @@ void __time_critical_func(handle_write_disable_next_osdsys_hook)(uint8_t w)
     static uint8_t counter = 0;
     counter++;
 
-    if (counter == 1 && w == 0x5a) {}
-    else if (counter == 2 && w == 0x61) {}
-    else if (counter == 3 && w == 0x1c)
+    if      (counter == 1 && w == GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 1)) {}
+    else if (counter == 2 && w == GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 2)) {}
+    else if (counter == 3 && w == GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 3))
     {
         disable_next_osdsys_hook = true;
         boot_rom_data_out_start_status_code(MODCHIP_CMD_RESULT_OK);
