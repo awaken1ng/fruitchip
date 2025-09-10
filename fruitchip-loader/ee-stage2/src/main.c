@@ -2,6 +2,7 @@
 
 #include <kernel.h>
 #include <sio.h>
+#include <libgs.h>
 
 #include <modchip/io.h>
 #include <modchip/apps.h>
@@ -17,6 +18,7 @@ DISABLE_PATCHED_FUNCTIONS();
 inline static void panic(const char *msg)
 {
     sio_puts(msg);
+    GS_SET_BGCOLOR(0x70, 0x00, 0x00);
     asm volatile("break\n");
 }
 
