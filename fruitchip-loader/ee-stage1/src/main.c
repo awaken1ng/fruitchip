@@ -1,5 +1,6 @@
 #include <kernel.h>
 #include <sio.h>
+#include <libgs.h>
 
 #include <modchip/io.h>
 #include <modchip/cmd.h>
@@ -10,6 +11,7 @@ inline static void modchip_cmd_or_panic(u32 cmd)
     if (!modchip_cmd(cmd))
     {
         sio_puts("EE1: cmd failed");
+        GS_SET_BGCOLOR(0x70, 0x00, 0x00);
         asm volatile("break\n");
     }
 }
