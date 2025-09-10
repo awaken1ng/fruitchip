@@ -27,22 +27,6 @@ exit:
     }
 }
 
-void __time_critical_func(handle_write_get_ee_stage1)(uint8_t w)
-{
-    counter++;
-
-    switch (counter) {
-        case 1: if (w != GET_BYTE(MODCHIP_CMD_GET_EE_STAGE1, 1)) { goto exit; } break;
-        case 2: if (w != GET_BYTE(MODCHIP_CMD_GET_EE_STAGE1, 2)) { goto exit; } break;
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_GET_EE_STAGE1, 3)) { goto exit; }
-            boot_rom_data_out_start_data_with_status_code(MODCHIP_CMD_RESULT_OK, LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE, true);
-exit:
-        [[fallthrough]];
-        default:
-            write_handler = &handle_write_idle;
-            counter = 0;
-    }
-}
 
 void __time_critical_func(handle_write_get_ee_stage2_size)(uint8_t w)
 {
