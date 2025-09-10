@@ -52,27 +52,3 @@ inline static bool modchip_cmd(u32 cmd)
     modchip_poke_u32(cmd);
     return modchip_peek_u32() == MODCHIP_CMD_RESULT_OK;
 }
-
-u32 modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst)
-{
-    modchip_poke_u8(0x78);
-    modchip_poke_u8(0x22);
-    modchip_poke_u32(offset);
-    modchip_poke_u32(offset ^ 0xFFFFFFFF);
-    modchip_poke_u32(size);
-    modchip_poke_u32(size ^ 0xFFFFFFFF);
-    modchip_poke_u8(app_idx);
-    modchip_poke_u8(app_idx ^ 0xFF);
-
-    int r = modchip_peek_u32();
-    if (r != MODCHIP_CMD_RESULT_OK)
-        return r;
-
-    for (uiptr i = 0; i < size / 4; i += 4)
-        *(volatile u32 *)(dst + i) = modchip_peek_u32();
-
-    for (uiptr i = 0; i < size % 4; i += 1)
-        *(volatile u32 *)(dst + i) = modchip_peek_u8();
-
-    return MODCHIP_CMD_RESULT_OK;
-}
