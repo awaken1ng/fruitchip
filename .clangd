@@ -1,3 +1,6 @@
 CompileFlags:
-  # workaround for `drv_unsupported_opt_for_target`
-  Remove: [-G0]
+  # workaround for clangd not recognizing arguments
+  Remove: [
+    -G0,  # drv_unsupported_opt_for_target
+    -mno-explicit-relocs  # drv_unknown_argument
+  ]

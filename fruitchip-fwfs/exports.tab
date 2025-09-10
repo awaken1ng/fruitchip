@@ -1,8 +1,0 @@
-void _retonly(){};
-
-DECLARE_EXPORT_TABLE(fwfs, 1, 0)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-END_EXPORT_TABLE
