@@ -65,7 +65,7 @@ add_custom_command(
     TARGET fruitchip-loader-ee-stage1
     POST_BUILD
     COMMAND
-        mips64r5900el-ps2-elf-objcopy
+        ${CMAKE_OBJCOPY}
         -O binary
         -v
         $<TARGET_FILE:fruitchip-loader-ee-stage1>
