@@ -50,6 +50,7 @@ void __time_critical_func(handle_read_hook_osdsys)(uint8_t r)
             if (!disable_next_osdsys_hook)
                 boot_rom_data_out_start_data_without_status_code(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE, true);
 
+            disable_next_osdsys_hook = false;
             read_handler = handle_read_find_osdsys_elf;
             counter = 0;
             break;
