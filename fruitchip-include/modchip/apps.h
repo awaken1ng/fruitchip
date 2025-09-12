@@ -29,10 +29,10 @@ inline static bool modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst
         return false;
 
     for (uiptr i = 0; i < size; i += 4)
-        *(volatile u32 *)(dst + i) = modchip_peek_u32();
+        *(u32 *)(dst + i) = modchip_peek_u32();
 
     for (uiptr i = size - (size % 4); i < size; i += 1)
-        *(volatile u8 *)(dst + i) = modchip_peek_u8();
+        *(u8 *)(dst + i) = modchip_peek_u8();
 
     return true;
 }
