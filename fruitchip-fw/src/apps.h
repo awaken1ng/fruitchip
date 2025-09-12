@@ -11,27 +11,6 @@
 #define APPS_PARTITION_MAGIC2 0x4FB80AB4
 #define APPS_PARTITION_VERSION 1
 
-// struct Entry {
-//     u32 data_len;
-//     u32 attrs;
-//     u8 data[len];
-//     u32 crc32;
-// };
-//
-// struct LookupEntry {
-//     u32 *offset: Entry;
-//     u32 entry_len;
-// };
-//
-// struct Apps {
-//     u32 magic1;
-//     u32 magic2;
-//     u32 version;
-//     u32 entries_count;
-//     LookupEntry lookup[entries_count];
-//     Entry entries[entries_count];
-// };
-
 inline static bool apps_partition_detect()
 {
     bool is_magic1_valid = memcmp((void *)APPS_PARTITION_OFFSET, APPS_PARTITION_MAGIC1, sizeof(uint32_t)) == 0;
