@@ -7,6 +7,7 @@
 #include <boot_rom/handler.h>
 #include "reset.h"
 #include "apps.h"
+#include "settings.h"
 #include "panic.h"
 
 int __time_critical_func(main)()
@@ -24,6 +25,8 @@ int __time_critical_func(main)()
 
     if (!apps_partition_detect())
         panic_with_led(RGB_ERR_APPS, "Apps partition header not found");
+
+    settings_init();
 
     colored_status_led_set_on_with_color(RGB_OK);
 

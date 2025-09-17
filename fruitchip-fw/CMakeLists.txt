@@ -31,8 +31,10 @@ add_executable(fruitchip-fw
     src/boot_rom/write/disable_next_osdsys_hook.c
     src/boot_rom/write/get_payload.c
     src/boot_rom/write/idle.c
+    src/boot_rom/write/kv.c
     src/boot_rom/write/read_app.c
     src/reset.c
+    src/settings.c
 )
 
 target_include_directories(fruitchip-fw
