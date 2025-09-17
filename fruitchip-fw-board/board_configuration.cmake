@@ -37,3 +37,6 @@ else()
     # max supported flash size by RP2040 is 16 MB (see 2.6.3.1 in datasheet)
     message(FATAL_ERROR "Unsupported flash size")
 endif()
+
+set(WEAR_LEVELING_BACKING_SIZE 8192)
+math(EXPR WEAR_LEVELING_RP2040_FLASH_BASE "${SETTINGS_PARTITION_OFFSET} - 0x10000000" OUTPUT_FORMAT HEXADECIMAL)

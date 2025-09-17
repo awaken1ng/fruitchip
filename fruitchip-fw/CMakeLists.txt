@@ -17,6 +17,11 @@ pico_sdk_init()
 include(../fruitchip-fw-board/board_configuration.cmake)
 
 add_executable(fruitchip-fw
+    lib/fnv/hash_64a.c
+
+    lib/wear_leveling/wear_leveling.c
+    lib/wear_leveling/wear_leveling_rp2040_flash.c
+
     src/main.c
     src/boot_rom/handler.c
     src/boot_rom/data_out.c
@@ -32,6 +37,8 @@ add_executable(fruitchip-fw
 
 target_include_directories(fruitchip-fw
     PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/fnv
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/wear_leveling
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/../fruitchip-include
 )
@@ -47,7 +54,9 @@ target_compile_definitions(fruitchip-fw
         PICO_DEFAULT_WS2812_PIN=${PICO_DEFAULT_WS2812_PIN}
         APPS_PARTITION_OFFSET=${APPS_PARTITION_OFFSET}
         UPDATE_PARTITION_OFFSET=${UPDATE_PARTITION_OFFSET}
-        SETTINGS_PARTITION_OFFSET=${SETTINGS_PARTITION_OFFSET}
+        WEAR_LEVELING_BACKING_SIZE=${WEAR_LEVELING_BACKING_SIZE}
+        WEAR_LEVELING_RP2040_FLASH
+        WEAR_LEVELING_RP2040_FLASH_BASE=${WEAR_LEVELING_RP2040_FLASH_BASE}
 )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/boot_rom/boot_rom.pio ${CMAKE_CURRENT_BINARY_DIR}/boot_rom.pio)
@@ -68,6 +77,7 @@ target_link_libraries(fruitchip-fw
     pico_status_led
     hardware_pio
     hardware_dma
+    hardware_flash
 )
 
 pico_enable_stdio_uart(fruitchip-fw 0)
