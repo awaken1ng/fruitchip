@@ -14,14 +14,16 @@
 #include "fwfs.h"
 #include <modchip/io.h>
 #include <modchip/apps.h>
+#include <modchip/fwfs.h>
 #include "minmax.h"
 
 #define MAX_FILES 8
 
 typedef struct
 {
+    char mode;
     u8 idx;
-    u32 size;
+    u32 size; // note: fwfs_open relies on `size` and `attr` placed next to each other
     u32 attr;
     u32 offset;
 } fwfs_file_t;
@@ -57,6 +59,14 @@ static fwfs_file_t *get_file_handle_by_idx(u8 idx)
 }
 
 static u8 get_idx_from_name(const char *name)
+{
+    if (name[0] == '/')
+        return name[2];
+    else
+        return name[1];
+}
+
+static char get_mode_from_name(const char *name)
 {
     if (name[0] == '/')
         return name[1];
@@ -121,21 +131,42 @@ static int fwfs_open(iop_file_t *file, const char *name, int flags)
         return -EMFILE;
     }
 
-    u8 idx = get_idx_from_name(name);
+    fd->idx = get_idx_from_name(name);
+    fd->mode = get_mode_from_name(name);
 
-    bool ok = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), idx, &fd->size, true);
-    DPRINTF("open: result %x\n", ok);
-    if (!ok)
+    if (fd->mode == FWFS_MODE_DATA)
+    {
+        bool ok = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), fd->idx, &fd->size, true);
+        DPRINTF("open: result %x\n", ok);
+        if (!ok)
+        {
+            fs_unlock();
+            return -EIO;
+        }
+
+        fd->offset = MODCHIP_APPS_DATA_OFFSET;
+    }
+    else if (fd->mode == FWFS_MODE_ATTR)
+    {
+        bool ok = modchip_apps_read(MODCHIP_APPS_ATTR_SIZE, sizeof(fd->attr), fd->idx, &fd->attr, true);
+        if (!ok)
+        {
+            fs_unlock();
+            return -EIO;
+        }
+
+        fd->size = MODCHIP_APPS_ATTR_SIZE;
+        fd->offset = MODCHIP_APPS_ATTR_OFFSET;
+    }
+    else
     {
         fs_unlock();
-        return -EIO;
+        return -ENOSYS;
     }
 
-    fd->idx = idx;
-    fd->offset = MODCHIP_APPS_DATA_OFFSET;
     file->privdata = fd;
 
-    DPRINTF("open: idx=%i size=%i attr=0x%x\n", idx, fd->size, fd->attr);
+    DPRINTF("open: idx=%i size=%i attr=0x%x\n", fd->idx, fd->size, fd->attr);
 
     fs_unlock();
 
