@@ -38,6 +38,7 @@ void __time_critical_func(handle_write_kv_get)(uint8_t w)
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT: response = settings_get_menu_autoboot(); break;
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT_DELAY: response = settings_get_menu_autoboot_delay_sec(); break;
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT_ITEM_IDX: response = settings_get_menu_autoboot_item_idx(); break;
+                    case MODCHIP_SETTINGS_MENU_OSDSYS_SETTINGS: response = settings_get_menu_osdsys_options(); break;
                 }
 
                 boot_rom_data_out_start_data_with_status_code(MODCHIP_CMD_RESULT_OK, &response, sizeof(response), true);
@@ -99,6 +100,7 @@ void __time_critical_func(handle_write_kv_set)(uint8_t w)
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT: settings_set_menu_autoboot(value); break;
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT_DELAY: settings_set_menu_autoboot_delay_sec(value); break;
                     case MODCHIP_SETTINGS_MENU_AUTOBOOT_ITEM_IDX: settings_set_menu_autoboot_item_idx(value); break;
+                    case MODCHIP_SETTINGS_MENU_OSDSYS_SETTINGS: settings_set_menu_osdsys_options(value); break;
                 }
 
                 boot_rom_data_out_stop_busy_code(MODCHIP_CMD_RESULT_OK);

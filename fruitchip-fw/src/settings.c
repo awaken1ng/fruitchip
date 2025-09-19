@@ -7,13 +7,14 @@
 #include "wear_leveling.h"
 #include "panic.h"
 
-#define SETTINGS_VERSION_MAGIC (0x73de0001)
+#define SETTINGS_VERSION_MAGIC (0x73de0002)
 
 typedef struct {
     uint32_t version_magic;
     bool menu_autoboot;
     uint16_t menu_autoboot_delay_sec;
     uint8_t menu_autoboot_item_idx;
+    uint8_t menu_osdsys_options;
 } settings_t;
 
 static settings_t settings;
@@ -110,3 +111,20 @@ void settings_set_menu_autoboot_item_idx(uint16_t menu_autoboot_item_idx)
 }
 
 // endregion: menu_autoboot_item_idx
+
+
+// region: menu_osdsys_options
+
+uint8_t settings_get_menu_osdsys_options()
+{
+    return settings.menu_osdsys_options;
+}
+
+void settings_set_menu_osdsys_options(uint8_t menu_osdsys_options)
+{
+    if (settings.menu_osdsys_options == menu_osdsys_options) return;
+    settings.menu_osdsys_options = menu_osdsys_options;
+    settings_update_field(menu_osdsys_options);
+}
+
+// endregion: menu_osdsys_options
