@@ -16,9 +16,7 @@ void __time_critical_func(handle_write_disable_next_osdsys_hook)(uint8_t w)
     counter++;
 
     switch (counter) {
-        case 1: if (w != GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 1)) { goto exit; } break;
-        case 2: if (w != GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 2)) { goto exit; } break;
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 3)) { goto exit; }
+        case 1: if (w != GET_BYTE(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, 3)) { goto exit; }
             disable_next_osdsys_hook = true;
             boot_rom_data_out_start_status_code(MODCHIP_CMD_RESULT_OK);
 exit:

@@ -18,15 +18,13 @@ void __time_critical_func(handle_write_kv_get)(uint8_t w)
     counter++;
 
     switch (counter) {
-        case 1: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 1)) { goto exit; } break;
-        case 2: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 2)) { goto exit; } break;
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 3)) { goto exit; }
+        case 1: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 3)) { goto exit; }
 
-        case 4: idx = w; break;
-        case 5: idx |= w << 8; break;
+        case 2: idx = w; break;
+        case 3: idx |= w << 8; break;
 
-        case 6: idx_xor = w; break;
-        case 7: idx_xor |= w << 8;
+        case 4: idx_xor = w; break;
+        case 5: idx_xor |= w << 8;
         {
             bool is_valid_idx = (idx ^ idx_xor) == 0xFFFF && (idx < MODCHIP_SETTINGS_KEYS_TOTAL);
             bool is_valid = is_valid_idx;
@@ -67,25 +65,23 @@ void __time_critical_func(handle_write_kv_set)(uint8_t w)
     counter++;
 
     switch (counter) {
-        case 1: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 1)) { goto exit; } break;
-        case 2: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 2)) { goto exit; } break;
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 3)) { goto exit; }
+        case 1: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 3)) { goto exit; }
 
-        case 4: idx = w; break;
-        case 5: idx |= w << 8; break;
+        case 2: idx = w; break;
+        case 3: idx |= w << 8; break;
 
-        case 6: idx_xor = w; break;
-        case 7: idx_xor |= w << 8; break;
+        case 4: idx_xor = w; break;
+        case 5: idx_xor |= w << 8; break;
 
-        case 8: value = w; break;
-        case 9: value |= w << 8; break;
-        case 10: value |= w << 16; break;
-        case 11: value |= w << 24; break;
+        case 6: value = w; break;
+        case 7: value |= w << 8; break;
+        case 8: value |= w << 16; break;
+        case 9: value |= w << 24; break;
 
-        case 12: value_xor = w; break;
-        case 13: value_xor |= w << 8; break;
-        case 14: value_xor |= w << 16; break;
-        case 15: value_xor |= w << 24;
+        case 10: value_xor = w; break;
+        case 11: value_xor |= w << 8; break;
+        case 12: value_xor |= w << 16; break;
+        case 13: value_xor |= w << 24;
         {
             bool is_valid_idx = (idx ^ idx_xor) == 0xFFFF && (idx < MODCHIP_SETTINGS_KEYS_TOTAL);
             bool is_valid_read_offset = (value ^ value_xor) == 0xFFFFFFFF;
