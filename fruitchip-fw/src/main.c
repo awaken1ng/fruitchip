@@ -21,6 +21,7 @@ int __time_critical_func(main)()
 
     printf("fruitchip\n");
     printf("rev: %s\n", GIT_REV);
+    printf("flash size: 0x%x\n", PICO_FLASH_SIZE_BYTES);
 
     boot_rom_data_out_init();
 

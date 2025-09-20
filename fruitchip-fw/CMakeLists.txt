@@ -29,6 +29,7 @@ add_executable(fruitchip-fw
     src/boot_rom/read/idle.c
     src/boot_rom/read/osdsys.c
     src/boot_rom/write/disable_next_osdsys_hook.c
+    src/boot_rom/write/flash.c
     src/boot_rom/write/get_payload.c
     src/boot_rom/write/idle.c
     src/boot_rom/write/kv.c
@@ -55,6 +56,7 @@ target_compile_definitions(fruitchip-fw
         BOOT_ROM_CE_PIN=${BOOT_ROM_CE_PIN}
         BOOT_ROM_OE_PIN=${BOOT_ROM_OE_PIN}
         RST_PIN=${RST_PIN}
+        PICO_FLASH_SIZE_BYTES=${PICO_FLASH_SIZE_BYTES}
         PICO_DEFAULT_WS2812_PIN=${PICO_DEFAULT_WS2812_PIN}
         APPS_PARTITION_OFFSET=${APPS_PARTITION_OFFSET}
         UPDATE_PARTITION_OFFSET=${UPDATE_PARTITION_OFFSET}

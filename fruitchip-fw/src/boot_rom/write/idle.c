@@ -8,6 +8,7 @@
 #include "boot_rom/write/read_app.h"
 #include "boot_rom/write/kv.h"
 #include "boot_rom/write/version.h"
+#include "boot_rom/write/flash.h"
 
 void __time_critical_func(handle_write_cmd_group0)(uint8_t w)
 {
@@ -24,6 +25,7 @@ void __time_critical_func(handle_write_cmd_group0)(uint8_t w)
         assert_and_case(MODCHIP_CMD_KV_GET): write_handler = prepare_handle_write_kv_get; break;
         assert_and_case(MODCHIP_CMD_KV_SET): write_handler = prepare_handle_write_kv_set; break;
         assert_and_case(MODCHIP_CMD_GIT_REV): write_handler = prepare_handle_write_git_rev; break;
+        assert_and_case(MODCHIP_CMD_GET_FLASH_SIZE): write_handler = prepare_handle_write_get_flash_size; break;
         default: write_handler = handle_write_idle; break;
     }
 

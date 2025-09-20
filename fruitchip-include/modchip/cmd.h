@@ -11,6 +11,7 @@
 #define MODCHIP_CMD_KV_GET                   ((0x1d27 << 16) | (MODCHIP_CMD_GROUP0 << 8) | MODCHIP_CMD_PREFIX)
 #define MODCHIP_CMD_KV_SET                   ((0x40b1 << 16) | (MODCHIP_CMD_GROUP0 << 8) | MODCHIP_CMD_PREFIX)
 #define MODCHIP_CMD_GIT_REV                  ((0x1e6a << 16) | (MODCHIP_CMD_GROUP0 << 8) | MODCHIP_CMD_PREFIX)
+#define MODCHIP_CMD_GET_FLASH_SIZE           ((0x503a << 16) | (MODCHIP_CMD_GROUP0 << 8) | MODCHIP_CMD_PREFIX)
 
 enum
 {
