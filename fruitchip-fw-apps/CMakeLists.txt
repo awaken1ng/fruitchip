@@ -37,7 +37,7 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
         ${CMAKE_CURRENT_BINARY_DIR}/apps.uf2
         --family ${PICO_PLATFORM}
-        -o ${APPS_PARTITION_OFFSET}
+        -o ${APPS_PARTITION_ADDR}
     VERBATIM
     BYPRODUCTS
         ${CMAKE_CURRENT_BINARY_DIR}/apps.uf2

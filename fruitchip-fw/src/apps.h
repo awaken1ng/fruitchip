@@ -13,13 +13,13 @@
 
 inline static bool apps_partition_detect()
 {
-    bool is_magic1_valid = memcmp((void *)APPS_PARTITION_OFFSET, APPS_PARTITION_MAGIC1, sizeof(uint32_t)) == 0;
+    bool is_magic1_valid = memcmp((void *)APPS_PARTITION_ADDR, APPS_PARTITION_MAGIC1, sizeof(uint32_t)) == 0;
     if (!is_magic1_valid) return false;
 
-    bool is_magic2_valid = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x4) == APPS_PARTITION_MAGIC2;
+    bool is_magic2_valid = *(uint32_t *)(APPS_PARTITION_ADDR + 0x4) == APPS_PARTITION_MAGIC2;
     if (!is_magic2_valid) return false;
 
-    bool is_version_valid = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x8) == APPS_PARTITION_VERSION;
+    bool is_version_valid = *(uint32_t *)(APPS_PARTITION_ADDR + 0x8) == APPS_PARTITION_VERSION;
     if (!is_version_valid) return false;
 
     return true;
@@ -27,16 +27,16 @@ inline static bool apps_partition_detect()
 
 inline static uint32_t apps_partition_entries_count()
 {
-    return *(uint32_t *)(APPS_PARTITION_OFFSET + 0xC);
+    return *(uint32_t *)(APPS_PARTITION_ADDR + 0xC);
 }
 
 inline static uint8_t *apps_partition_entry_addr(uint32_t idx)
 {
-    uint32_t offset = *(uint32_t *)(APPS_PARTITION_OFFSET + 0x10 + (idx * 2 * sizeof(uint32_t)));
-    return (uint8_t *)(APPS_PARTITION_OFFSET + offset);
+    uint32_t offset = *(uint32_t *)(APPS_PARTITION_ADDR + 0x10 + (idx * 2 * sizeof(uint32_t)));
+    return (uint8_t *)(APPS_PARTITION_ADDR + offset);
 }
 
 inline static uint32_t apps_partition_entry_length(uint32_t idx)
 {
-    return *(uint32_t *)(APPS_PARTITION_OFFSET + 0x14 + (idx * 2 * sizeof(uint32_t)));
+    return *(uint32_t *)(APPS_PARTITION_ADDR + 0x14 + (idx * 2 * sizeof(uint32_t)));
 }
