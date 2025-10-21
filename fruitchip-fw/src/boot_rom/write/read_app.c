@@ -7,11 +7,8 @@
 #include <boot_rom/handler.h>
 #include "idle.h"
 
-static uint8_t counter = 0;
-
 void __time_critical_func(handle_write_read_apps_partition)(uint8_t w)
 {
-
     static uint32_t read_offset = 0;
     static uint32_t read_offset_xor = 0;
     static uint32_t read_size = 0;
@@ -20,36 +17,36 @@ void __time_critical_func(handle_write_read_apps_partition)(uint8_t w)
     static uint8_t app_idx_xor = 0;
     static bool with_crc = 0;
 
-    counter += 1;
+    cmd_byte_counter++;
 
-    switch (counter) {
-        case 1: if (w != GET_BYTE(MODCHIP_CMD_READ_APP, 3)) { goto exit; } break;
+    switch (cmd_byte_counter) {
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_READ_APP, 3)) { goto exit; } break;
 
-        case 2: read_offset = w; break;
-        case 3: read_offset |= w << 8; break;
-        case 4: read_offset |= w << 16; break;
-        case 5: read_offset |= w << 24; break;
+        case 4: read_offset = w; break;
+        case 5: read_offset |= w << 8; break;
+        case 6: read_offset |= w << 16; break;
+        case 7: read_offset |= w << 24; break;
 
-        case 6: read_offset_xor = w; break;
-        case 7: read_offset_xor |= w << 8; break;
-        case 8: read_offset_xor |= w << 16; break;
-        case 9: read_offset_xor |= w << 24; break;
+        case 8: read_offset_xor = w; break;
+        case 9: read_offset_xor |= w << 8; break;
+        case 10: read_offset_xor |= w << 16; break;
+        case 11: read_offset_xor |= w << 24; break;
 
-        case 10: read_size = w; break;
-        case 11: read_size |= w << 8; break;
-        case 12: read_size |= w << 16; break;
-        case 13: read_size |= w << 24; break;
+        case 12: read_size = w; break;
+        case 13: read_size |= w << 8; break;
+        case 14: read_size |= w << 16; break;
+        case 15: read_size |= w << 24; break;
 
-        case 14: read_size_xor = w; break;
-        case 15: read_size_xor |= w << 8; break;
-        case 16: read_size_xor |= w << 16; break;
-        case 17: read_size_xor |= w << 24; break;
+        case 16: read_size_xor = w; break;
+        case 17: read_size_xor |= w << 8; break;
+        case 18: read_size_xor |= w << 16; break;
+        case 19: read_size_xor |= w << 24; break;
 
-        case 18: app_idx = w; break;
-        case 19: app_idx_xor = w; break;
+        case 20: app_idx = w; break;
+        case 21: app_idx_xor = w; break;
 
-        case 20: with_crc = w; break;
-        case 21:
+        case 22: with_crc = w; break;
+        case 23:
         {
             uint8_t with_crc_xor = w;
 
@@ -72,13 +69,5 @@ exit:
         [[fallthrough]];
         default:
             write_handler = &handle_write_idle;
-            counter = 0;
     }
-}
-
-void __time_critical_func(prepare_handle_write_read_apps_partition)(uint8_t w)
-{
-    counter = 0;
-    write_handler = handle_write_read_apps_partition;
-    write_handler(w);
 }
