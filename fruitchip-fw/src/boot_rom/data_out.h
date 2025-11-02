@@ -195,6 +195,10 @@ inline static void boot_rom_sniffers_reset()
 
 inline static void boot_rom_data_out_start_data_with_status_code(uint32_t status_code, const volatile void *read_addr, uint32_t encoded_transfer_count, bool crc)
 {
+    // restore FIFOs join if it was unjoined by busy code
+    // note, this also clears FIFOs, see `pio_sm_clear_fifos`
+    hw_set_bits(&pio0->sm[BOOT_ROM_DATA_OUT_SM].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
+
     boot_rom_sniffers_stop();
 
     if (crc)
@@ -223,6 +227,10 @@ inline static void boot_rom_data_out_start_data_with_status_code(uint32_t status
 
 inline static void boot_rom_data_out_start_data_without_status_code(const volatile void *read_addr, uint32_t encoded_transfer_count, bool crc)
 {
+    // restore FIFOs join if it was unjoined by busy code
+    // note, this also clears FIFOs, see `pio_sm_clear_fifos`
+    hw_set_bits(&pio0->sm[BOOT_ROM_DATA_OUT_SM].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
+
     if (crc)
     {
         dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, &dma_hw->sniff_data, false);
@@ -244,6 +252,10 @@ inline static void boot_rom_data_out_start_data_without_status_code(const volati
 
 inline static void boot_rom_data_out_start_status_code(uint32_t status_code)
 {
+    // restore FIFOs join if it was unjoined by busy code
+    // note, this also clears FIFOs, see `pio_sm_clear_fifos`
+    hw_set_bits(&pio0->sm[BOOT_ROM_DATA_OUT_SM].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
+
     boot_rom_sniffers_stop();
 
     dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, 0, false);
@@ -259,6 +271,10 @@ inline static void boot_rom_data_out_start_status_code(uint32_t status_code)
 
 inline static void boot_rom_data_out_start_busy_code()
 {
+    // unjoin FIFOs to reduce queue depth, changes the minimum amount of busy codes from 3 to 2
+    // note, this also clears FIFOs, see `pio_sm_clear_fifos`
+    hw_clear_bits(&pio0->sm[BOOT_ROM_DATA_OUT_SM].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
+
     boot_rom_sniffers_stop();
     dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN, BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, true); // busy -> reset
     boot_rom_data_out_start();
