@@ -142,11 +142,11 @@ inline static void boot_rom_data_out_init()
     channel_config_set_transfer_data_size(&dma_tx_busy_reset_conf, DMA_SIZE_32);
     channel_config_set_read_increment(&dma_tx_busy_reset_conf, false);
     channel_config_set_write_increment(&dma_tx_busy_reset_conf, false);
-    channel_config_set_dreq(&dma_tx_busy_reset_conf, pio_get_dreq(pio0, BOOT_ROM_DATA_OUT_SM, true));
+    channel_config_set_dreq(&dma_tx_busy_reset_conf, DREQ_FORCE);
     channel_config_set_chain_to(&dma_tx_busy_reset_conf, BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN);
     dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, &_boot_rom_data_out_busy_code_ptr, false);
     dma_channel_set_write_addr(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, &dma_channel_hw_addr(BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN)->read_addr, false);
-    dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, sizeof(_boot_rom_data_out_busy_code), false);
+    dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, 1, false);
 
     dma_channel_set_config(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, &dma_tx_status_conf, false);
     dma_channel_set_config(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, &dma_tx_data_conf, false);
@@ -276,6 +276,8 @@ inline static void boot_rom_data_out_start_busy_code()
     hw_clear_bits(&pio0->sm[BOOT_ROM_DATA_OUT_SM].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
 
     boot_rom_sniffers_stop();
+
+    dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN, false); // busy <- reset
     dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN, BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, true); // busy -> reset
     boot_rom_data_out_start();
     boot_rom_sniffers_reset();
@@ -283,11 +285,10 @@ inline static void boot_rom_data_out_start_busy_code()
 
 inline static void boot_rom_data_out_stop_busy_code(uint32_t status_code)
 {
-    dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, 0, false);
-    dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, 0, false);
-
     _boot_rom_data_out_status_code = status_code;
     dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, &_boot_rom_data_out_status_code, false);
-    dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, BOOT_ROM_DATA_OUT_NULL_DMA_CHAN, false); // status -> null
-    dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_BUSY_DMA_CHAN, BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, false); // busy -> status -> null
+
+    // busy and busy reset are running in ping-pong, chain busy reset -> status -> null to end data out
+    dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, BOOT_ROM_DATA_OUT_NULL_DMA_CHAN, false);
+    dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_BUSY_RESET_DMA_CHAN, BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, false);
 }
