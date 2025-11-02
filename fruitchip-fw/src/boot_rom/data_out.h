@@ -205,6 +205,7 @@ inline static void boot_rom_data_out_start_data_with_status_code(uint32_t status
     {
         dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, &dma_hw->sniff_data, false);
         dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, sizeof(dma_hw->sniff_data), false);
+        dma_sniffer_enable(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, 0, false);
         dma_sniffer_set_data_accumulator(0xFFFFFFFF);
         dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, false); // status -> data -> crc -> null
     }
@@ -235,6 +236,7 @@ inline static void boot_rom_data_out_start_data_without_status_code(const volati
     {
         dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, &dma_hw->sniff_data, false);
         dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, sizeof(dma_hw->sniff_data), false);
+        dma_sniffer_enable(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, 0, false);
         dma_sniffer_set_data_accumulator(0xFFFFFFFF);
         dma_channel_set_chain_to(BOOT_ROM_DATA_OUT_DATA_DMA_CHAN, BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, false); // data -> crc -> null
     }
