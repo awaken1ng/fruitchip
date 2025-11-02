@@ -17,7 +17,7 @@ void __time_critical_func(handle_write_kv_get)(uint8_t w)
 
     switch (cmd_byte_counter)
     {
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 3)) { goto exit; }
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_GET, 3)) { goto exit; } break;
 
         case 4: idx = w; break;
         case 5: idx |= w << 8; break;
@@ -64,7 +64,7 @@ void __time_critical_func(handle_write_kv_set)(uint8_t w)
 
     switch (cmd_byte_counter)
     {
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 3)) { goto exit; }
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_KV_SET, 3)) { goto exit; } break;
 
         case 4: idx = w; break;
         case 5: idx |= w << 8; break;
