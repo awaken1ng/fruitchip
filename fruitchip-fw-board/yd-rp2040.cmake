@@ -1,3 +1,6 @@
+# comes in 4, 8 and 16 MiB variants
+set(FLASH_SIZE_MB 4)
+
 set(BOOT_ROM_Q0_PIN 2)
 set(BOOT_ROM_CE_PIN 10)
 set(BOOT_ROM_OE_PIN 11)
