@@ -4,6 +4,10 @@ include(FetchContent)
 
 project(fruitchip-menu)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
 add_executable(fruitchip-menu
