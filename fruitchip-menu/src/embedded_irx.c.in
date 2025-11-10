@@ -1,0 +1,38 @@
+#include <stdint.h>
+
+// need to be aligned, SifExecModuleBuffer errors out otherwise
+
+uint8_t PPCTTY_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/ppctty.irx"
+};
+uint32_t const PPCTTY_IRX_SIZE = sizeof(PPCTTY_IRX);
+
+uint8_t FWFS_IRX[] __attribute__((aligned(16))) = {
+    #embed "${FWFS_INSTALL_PREFIX}/fruitchip-fwfs.irx"
+};
+uint32_t const FWFS_IRX_SIZE = sizeof(FWFS_IRX);
+
+uint8_t FREEPAD_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/freepad.irx"
+};
+uint32_t const FREEPAD_IRX_SIZE = sizeof(FREEPAD_IRX);
+
+uint8_t const BDM_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/bdm.irx"
+};
+uint32_t const BDM_IRX_SIZE = sizeof(BDM_IRX);
+
+uint8_t const BDMFS_FATFS_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/bdmfs_fatfs.irx"
+};
+uint32_t const BDMFS_FATFS_IRX_SIZE = sizeof(BDMFS_FATFS_IRX);
+
+uint8_t const USBD_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/usbd.irx"
+};
+uint32_t const USBD_IRX_SIZE = sizeof(BDMFS_FATFS_IRX);
+
+uint8_t const USBMASS_BD_IRX[] __attribute__((aligned(16))) = {
+    #embed "$ENV{PS2SDK}/iop/irx/usbmass_bd.irx"
+};
+uint32_t const USBMASS_BD_IRX_SIZE = sizeof(USBMASS_BD_IRX);

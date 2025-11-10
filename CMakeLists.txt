@@ -43,6 +43,19 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+    fruitchip-menu
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-menu"
+    CMAKE_ARGS
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
+        -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
+        -DFWFS_INSTALL_PREFIX=${FWFS_INSTALL_PREFIX}
+    DEPENDS
+        fruitchip-fwfs
+    INSTALL_COMMAND cmake -E true
+    BUILD_ALWAYS 1
+)
+
+ExternalProject_Add(
     fruitchip-fw
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-fw"
     CMAKE_ARGS
@@ -74,6 +87,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
     append_to_compilation_databases(fruitchip-fw-bootloader)
     append_to_compilation_databases(fruitchip-fw)
     append_to_compilation_databases(fruitchip-fwfs)
+    append_to_compilation_databases(fruitchip-menu)
     append_to_compilation_databases(fruitchip-loader)
 
     add_custom_target(
