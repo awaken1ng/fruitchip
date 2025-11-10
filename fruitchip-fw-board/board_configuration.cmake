@@ -7,9 +7,11 @@ else()
 endif()
 
 if (NOT DEFINED FLASH_SIZE_MB)
-    message("Flash size not defined, defaulting to 2 MB")
+    message("Flash size not defined, defaulting to 2 MiB")
     set(FLASH_SIZE_MB 2)
 endif()
+
+message("Flash size: ${FLASH_SIZE_MB} MiB")
 
 # split flash in 5 partitions: boot, fw, update, settings, apps
 
@@ -43,6 +45,6 @@ elseif(FLASH_SIZE_MB EQUAL 16)
     # 32 + 648 + 648 + 8 + 15048 KiB
     math(EXPR APPS_PARTITION_SIZE_BYTES "15048 * 1024") # 15048 KiB
 else()
-    # max supported flash size by RP2040 is 16 MB (see 2.6.3.1 in datasheet)
+    # max supported flash size by RP2040 is 16 MiB (see 2.6.3.1 in datasheet)
     message(FATAL_ERROR "Unsupported flash size")
 endif()
