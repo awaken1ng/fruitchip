@@ -39,3 +39,8 @@ add_custom_command(
         -o ${CMAKE_CURRENT_BINARY_DIR}/fruitchip-fwfs.irx
         ${CMAKE_CURRENT_BINARY_DIR}/fruitchip-fwfs
 )
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/fruitchip-fwfs.irx
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
