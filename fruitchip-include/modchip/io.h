@@ -15,7 +15,7 @@ inline static void modchip_poke_u8(u8 byte)
     // if writing "too fast", CE will stay high the entire time,
     // without WE wired up, modchip can only see a single byte,
     // force CE low by waiting for a bit
-    sleep_us(2);
+    sleep_us(4);
 }
 
 inline static void modchip_poke_u16(u16 v)
