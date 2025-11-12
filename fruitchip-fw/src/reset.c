@@ -48,6 +48,7 @@ static void __time_critical_func(reset_pressed)(uint gpio, uint32_t event_mask)
             pio_sm_drain_tx_fifo(pio0, BOOT_ROM_DATA_OUT_SM);
 
             dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN, &_boot_rom_data_out_status_code, false);
+            dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_CRC_DMA_CHAN, &dma_hw->sniff_data, false);
 
             disable_next_osdsys_hook = false;
             flash_write_lock = true;
