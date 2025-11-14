@@ -47,14 +47,14 @@ inline static bool ExecPS2FromModchipApps(u8 app_idx, int argc, char *argv[])
     elf_pheader_t eph;
     int i;
 
-    bool failed = !modchip_apps_read(
+    s32 ret = modchip_apps_read(
         MODCHIP_APPS_DATA_OFFSET,
         sizeof(eh),
         app_idx,
         &eh,
         true
     );
-    if (failed)
+    if (ret)
     {
         sio_puts("failed to read elf header");
         return false;
@@ -70,7 +70,7 @@ inline static bool ExecPS2FromModchipApps(u8 app_idx, int argc, char *argv[])
     // then zero out any non-loaded regions.
     for (i = 0; i < eh.phnum; i++)
     {
-        if (!modchip_apps_read(
+        if (modchip_apps_read(
                 MODCHIP_APPS_DATA_OFFSET + eh.phoff + (sizeof(eph) * i),
                 sizeof(eph),
                 app_idx,
@@ -85,7 +85,7 @@ inline static bool ExecPS2FromModchipApps(u8 app_idx, int argc, char *argv[])
         if (eph.type != ELF_PT_LOAD)
             continue;
 
-        if (!modchip_apps_read(
+        if (modchip_apps_read(
                 MODCHIP_APPS_DATA_OFFSET + eph.offset,
                 eph.filesz,
                 app_idx,

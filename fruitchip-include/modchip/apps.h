@@ -1,5 +1,7 @@
 #pragma once
 
+#include <errno.h>
+
 #include "io.h"
 #include "cmd.h"
 #include "../crc32.h"
@@ -17,7 +19,7 @@
 
 #define MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK (1 << 0)
 
-inline static bool modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst, bool with_crc)
+inline static s32 modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst, bool with_crc)
 {
     modchip_poke_u32(MODCHIP_CMD_READ_APP);
     modchip_poke_u32(offset);
@@ -31,7 +33,7 @@ inline static bool modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst
 
     int r = modchip_peek_u32();
     if (r != MODCHIP_CMD_RESULT_OK)
-        return false;
+        return -EPROTO;
 
     for (uiptr i = 0; i < size; i += 4)
         *(u32 *)(dst + i) = modchip_peek_u32();
@@ -43,8 +45,12 @@ inline static bool modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst
     {
         u32 crc_expected = modchip_peek_u32();
         u32 crc_actual = crc32((uint8_t *)dst, size);
-        return crc_expected == crc_actual;
+        return crc_expected == crc_actual
+            ? 0
+            : -EIO;
     }
     else
-        return true;
+    {
+        return 0;
+    }
 }

@@ -136,9 +136,9 @@ static int fwfs_open(iop_file_t *file, const char *name, int flags)
 
     if (fd->mode == FWFS_MODE_DATA_CHAR)
     {
-        bool ok = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), fd->idx, &fd->size, true);
-        DPRINTF("open: result %x\n", ok);
-        if (!ok)
+        s32 ret = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), fd->idx, &fd->size, true);
+        DPRINTF("open: data: result %i\n", ret);
+        if (ret)
         {
             fs_unlock();
             return -EIO;
@@ -148,8 +148,9 @@ static int fwfs_open(iop_file_t *file, const char *name, int flags)
     }
     else if (fd->mode == FWFS_MODE_ATTR_CHAR)
     {
-        bool ok = modchip_apps_read(MODCHIP_APPS_ATTR_SIZE, sizeof(fd->attr), fd->idx, &fd->attr, true);
-        if (!ok)
+        s32 ret = modchip_apps_read(MODCHIP_APPS_ATTR_SIZE, sizeof(fd->attr), fd->idx, &fd->attr, true);
+        DPRINTF("open: attr: result %i\n", ret);
+        if (ret)
         {
             fs_unlock();
             return -EIO;
@@ -220,9 +221,9 @@ static int fwfs_read(iop_file_t *file, void *ptr, int size)
     u32 available_size = MIN((u32)size, remaining_size);
     DPRINTF("read: rem %i ava %i\n", remaining_size, available_size);
 
-    bool ok = modchip_apps_read(fd->offset, available_size, fd->idx, ptr, true);
-    DPRINTF("read: cmd: off %i size %i idx %i: ret %x\n", fd->offset, size, fd->idx, ok);
-    if (!ok)
+    s32 ret = modchip_apps_read(fd->offset, available_size, fd->idx, ptr, true);
+    DPRINTF("read: cmd: off %i size %i idx %i: ret %i\n", fd->offset, size, fd->idx, ret);
+    if (ret)
     {
         fs_unlock();
         return -EIO;
@@ -252,9 +253,9 @@ static int fwfs_getstat(iop_file_t *file, const char *name, io_stat_t *stat)
     {
         fwfs_file_t file = {};
 
-        bool ok = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), idx, &file.size, true);
-        DPRINTF("stat: result %x\n", ok);
-        if (!ok)
+        s32 ret = modchip_apps_read(MODCHIP_APPS_SIZE_OFFSET, sizeof(fd->size) + sizeof(fd->attr), idx, &file.size, true);
+        DPRINTF("stat: result %i\n", ret);
+        if (ret)
         {
             fs_unlock();
             return -EIO;
