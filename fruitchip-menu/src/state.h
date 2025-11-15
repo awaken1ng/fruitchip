@@ -28,6 +28,9 @@ struct state {
     struct button_guide_state button_guide;
 
     struct list_state boot_list;
+
+    u32 *apps_attr;
+
     bool autoboot;
     u32 autoboot_item_idx;
     u32 autoboot_delay_sec;
