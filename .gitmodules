@@ -1,6 +1,6 @@
 [submodule "sdk"]
 	path = pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
-[submodule "ps2bbl"]
-	path = ps2bbl
+[submodule "fruitchip-fw-apps/ps2bbl"]
+	path = fruitchip-fw-apps/ps2bbl
 	url = https://github.com/israpps/PlayStation2-Basic-BootLoader.git

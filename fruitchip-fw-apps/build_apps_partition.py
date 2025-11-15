@@ -17,7 +17,8 @@ class Attribute(enum.Flag):
 
 
 apps = [
-    ('PS2BBL',  Path('../ps2bbl/bin/COMPRESSED_PS2BBL.ELF'),            Attribute(0)),
+    ('PS2BBL (MX4SIO)',  Path('ps2bbl_mx4sio.elf'), Attribute(0)),
+    ('PS2BBL (MMCE)',  Path('ps2bbl_mmce.elf'), Attribute(0)),
 ]
 
 

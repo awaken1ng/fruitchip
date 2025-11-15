@@ -12,8 +12,26 @@ add_custom_target(
     fruitchip-fw-apps
     ALL
     SOURCES
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mx4sio.elf
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mmce.elf
         ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
         apps/_always_rerun
+)
+
+add_custom_command(
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mx4sio.elf
+    COMMAND make clean packed MX4SIO=1
+    COMMAND cmake -E copy bin/COMPRESSED_PS2BBL.ELF ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mx4sio.elf
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ps2bbl
+)
+
+add_custom_command(
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mmce.elf
+    COMMAND make clean packed MMCE=1
+    COMMAND cmake -E copy bin/COMPRESSED_PS2BBL.ELF ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mmce.elf
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ps2bbl
 )
 
 add_custom_command(
@@ -21,9 +39,10 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
         apps/_always_rerun
     DEPENDS
-        ../ps2bbl/bin/COMPRESSED_PS2BBL.ELF
-    COMMAND python build_apps_partition.py ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mx4sio.elf
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mmce.elf
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/build_apps_partition.py ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 math(EXPR APPS_PARTITION_ADDR "0x10000000 + ${APPS_PARTITION_OFFSET}" OUTPUT_FORMAT HEXADECIMAL)
