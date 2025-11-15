@@ -93,6 +93,9 @@ void list_draw_items(GSGLOBAL *gs, struct list_state *state)
 {
     u32 start_idx, end_idx;
 
+    if (!state->items_count)
+        return;
+
     if (state->hilite_idx < state->max_items)
     {
         start_idx = 0;
