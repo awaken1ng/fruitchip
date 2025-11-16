@@ -64,6 +64,8 @@ static void scene_paint_handler_settings(struct state *state)
 
 void scene_switch_to_settings_about(struct state *state)
 {
+    list.hilite_idx = 0;
+
     struct list_item item;
 
     item.left_text = wstring_new_static(L"Menu version");
