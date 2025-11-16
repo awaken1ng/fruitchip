@@ -67,7 +67,7 @@ add_custom_command(
         convert
         ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
         ${CMAKE_CURRENT_BINARY_DIR}/apps.uf2
-        --family ${PICO_PLATFORM}
+        --family rp2040
         -o ${APPS_PARTITION_ADDR}
     VERBATIM
     BYPRODUCTS
