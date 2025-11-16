@@ -133,6 +133,7 @@ void scene_switch_to_options(struct state *state, u8 app_idx)
     wstring_free(scene_state.header);
     scene_state.header = wstring_new_copied_wstr(header);
 
+    scene_state.list.hilite_idx = 0;
     scene_state.list.start_item_idx = 0;
     scene_state.list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
 
