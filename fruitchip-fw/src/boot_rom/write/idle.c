@@ -23,6 +23,7 @@ void __time_critical_func(handle_write_cmd_group0)(uint8_t w)
         assert_and_case(MODCHIP_CMD_GET_EE_STAGE1_SIZE): write_handler = handle_write_get_ee_stage1_size; break;
         assert_and_case(MODCHIP_CMD_GET_EE_STAGE2_SIZE): write_handler = handle_write_get_ee_stage2_size; break;
         assert_and_case(MODCHIP_CMD_GET_EE_STAGE2): write_handler = handle_write_get_ee_stage2; break;
+        assert_and_case(MODCHIP_CMD_READ_EE_STAGE3): write_handler = handle_write_read_ee_stage3; break;
         assert_and_case(MODCHIP_CMD_READ_APP): write_handler = handle_write_read_apps_partition; break;
         assert_and_case(MODCHIP_CMD_KV_GET): write_handler = handle_write_kv_get; break;
         assert_and_case(MODCHIP_CMD_KV_SET): write_handler = handle_write_kv_set; break;

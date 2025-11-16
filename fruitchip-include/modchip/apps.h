@@ -20,6 +20,42 @@
 #define MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK (1 << 0)
 #define MODCHIP_APPS_ATTR_OSDSYS (1 << 1)
 
+inline static s32 modchip_stage3_read(u32 offset, u32 size, void *dst, bool with_crc)
+{
+    modchip_poke_u32(MODCHIP_CMD_READ_EE_STAGE3);
+    modchip_poke_u32(offset);
+    modchip_poke_u32(offset ^ 0xFFFFFFFF);
+    modchip_poke_u32(size);
+    modchip_poke_u32(size ^ 0xFFFFFFFF);
+    modchip_poke_u8(with_crc);
+    modchip_poke_u8(with_crc ^ 0xFF);
+
+    int r = modchip_peek_u32();
+    if (r == BOOT_ROM_ADDR_VALUE)
+        return -ENODEV;
+    else if (r != MODCHIP_CMD_RESULT_OK)
+        return -EINVAL;
+
+    for (uiptr i = 0; i < size - (size % 4); i += 4)
+        *(u32 *)(dst + i) = modchip_peek_u32();
+
+    for (uiptr i = size - (size % 4); i < size; i += 1)
+        *(u8 *)(dst + i) = modchip_peek_u8();
+
+    if (with_crc)
+    {
+        u32 crc_expected = modchip_peek_u32();
+        u32 crc_actual = crc32((uint8_t *)dst, size);
+        return crc_expected == crc_actual
+            ? 0
+            : -EIO;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 inline static s32 modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst, bool with_crc)
 {
     modchip_poke_u32(MODCHIP_CMD_READ_APP);
