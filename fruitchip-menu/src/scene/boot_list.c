@@ -19,13 +19,54 @@
 
 #include "../components/font.h"
 #include "../components/list.h"
-#include "boot_options_osdsys.h"
+#include "boot_options.h"
 #include "message.h"
 #include "settings.h"
 #include "superscene.h"
+#include "../boot_list.h"
 #include "../constants.h"
 #include "../state.h"
 #include "../utils.h"
+
+static void boot_osdsys(struct state *state)
+{
+    modchip_cmd(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK);
+    SifExitCmd();
+
+    int argc = 0;
+    char *argv[4];
+    if (state->osdsys.field.skip_intro) argv[argc++] = "BootClock";
+    if (state->osdsys.field.boot_browser) argv[argc++] = "BootBrowser";
+    if (state->osdsys.field.skip_mc_update) argv[argc++] = "SkipMc";
+    if (state->osdsys.field.skip_hdd_update) argv[argc++] = "SkipHdd";
+    ExecOSD(argc, argv);
+}
+
+static void boot_fwfs(struct state *state)
+{
+    u8 app_idx = state->boot_list.hilite_idx;
+
+    int argc =  0;
+    char *argv[4];
+
+    u32 attr = state->apps_attr[app_idx];
+
+    if (attr & MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK)
+    {
+        modchip_cmd(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK);
+    }
+
+    if (attr & MODCHIP_APPS_ATTR_OSDSYS)
+    {
+        if (state->osdsys.field.skip_intro) argv[argc++] = "BootClock";
+        if (state->osdsys.field.boot_browser) argv[argc++] = "BootBrowser";
+        if (state->osdsys.field.skip_mc_update) argv[argc++] = "SkipMc";
+        if (state->osdsys.field.skip_hdd_update) argv[argc++] = "SkipHdd";
+    }
+
+    char path[] = { 'f', 'w', 'f', 's', ':', FWFS_MODE_DATA_CHAR, app_idx };
+    LoadELFFromFile(path, 0, NULL);
+}
 
 // region: input
 
@@ -33,33 +74,11 @@ static void boot_hilited_item(struct state *state)
 {
     if (state->boot_list.hilite_idx == BOOT_ITEM_OSDSYS)
     {
-        modchip_cmd(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK);
-        SifExitCmd();
-
-        int args_len =  0;
-        char *args[4];
-        if (state->osdsys.field.skip_intro) args[args_len++] = "BootClock";
-        if (state->osdsys.field.boot_browser) args[args_len++] = "BootBrowser";
-        if (state->osdsys.field.skip_mc_update) args[args_len++] = "SkipMc";
-        if (state->osdsys.field.skip_hdd_update) args[args_len++] = "SkipHdd";
-        ExecOSD(args_len, args);
+        boot_osdsys(state);
     }
     else if (state->boot_list.hilite_idx >= BOOT_ITEM_FWFS)
     {
-        //            01234 5 6
-        char *path = "fwfs:\0\0";
-        path[6] = state->boot_list.hilite_idx;
-        path[5] = FWFS_MODE_ATTR_CHAR;
-
-        u32 attr = 0;
-        int fd = open(path, 0);
-        read(fd, &attr, sizeof(attr));
-        close(fd);
-
-        if (attr & MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK) modchip_cmd(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK);
-
-        path[5] = FWFS_MODE_DATA_CHAR;
-        LoadELFFromFile(path, 0, NULL);
+        boot_fwfs(state);
     }
 }
 
@@ -111,10 +130,10 @@ void scene_input_handler_boot_list(struct state *state, int input)
     }
     else if (input & PAD_TRIANGLE)
     {
-        if (state->boot_list.hilite_idx == 0)
-        {
-            scene_switch_to_options_osdsys(state);
-        }
+        u8 app_idx = state->boot_list.hilite_idx;
+        u32 attr = state->apps_attr[app_idx];
+        if (attr)
+            scene_switch_to_options(state, app_idx);
     }
     else if (input & PAD_SQUARE)
     {
@@ -156,9 +175,12 @@ static void draw_button_guide(struct state *state)
 
     state->button_guide.cross = L"Launch";
 
+    u8 app_idx = state->boot_list.hilite_idx;
+    u32 attr = state->apps_attr[app_idx];
+
     state->button_guide.start = L"Settings";
 
-    if (state->boot_list.hilite_idx == BOOT_ITEM_OSDSYS)
+    if (attr)
         state->button_guide.triangle = L"Options";
 
     if (!is_autoboot_item_hilited(state))
@@ -206,13 +228,19 @@ void scene_switch_to_boot_list(struct state *state)
     };
     superscene_push_scene(&scene);
 
+    bool ret = apps_list_populate(state);
+    if (!ret)
+    {
+        scene_switch_to_message(state, L"Failed to load apps list");
+    }
+
 #ifndef NDEBUG
     printf("autoboot %i\n", state->autoboot);
     printf("autoboot_item_idx %i\n", state->autoboot_item_idx);
     printf("autoboot_delay_sec %i\n", state->autoboot_delay_sec);
 #endif
 
-    if (state->autoboot)
+    if (ret && state->autoboot)
     {
         state->autoboot_countdown = true;
         state->autoboot_countdown_sec = state->autoboot_delay_sec;

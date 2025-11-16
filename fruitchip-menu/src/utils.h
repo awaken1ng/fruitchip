@@ -4,6 +4,12 @@
 
 #include <gsKit.h>
 
+#ifdef NDEBUG
+    #define print_debug(x...) printf(x)
+#else
+    #define print_debug(x...)
+#endif
+
 int gsKit_texture_png_from_memory(GSGLOBAL *gsGlobal, GSTEXTURE *Texture, void *buf, size_t size);
 
 int snwprintf(wchar_t *buffer, size_t n, const wchar_t * format, ...);

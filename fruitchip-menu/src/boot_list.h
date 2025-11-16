@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "state.h"
 
-void apps_list_populate(struct state *state);
+bool apps_list_populate(struct state *state);

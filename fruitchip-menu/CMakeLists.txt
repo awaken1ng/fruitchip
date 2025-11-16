@@ -20,7 +20,7 @@ add_executable(fruitchip-menu
     src/input/pad.c
 
     src/scene/boot_list.c
-    src/scene/boot_options_osdsys.c
+    src/scene/boot_options.c
     src/scene/init.c
     src/scene/message.c
     src/scene/settings_about_update_apps.c

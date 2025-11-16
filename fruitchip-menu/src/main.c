@@ -125,7 +125,6 @@ int main()
 
     struct state *state = malloc(sizeof(*state));
 
-    apps_list_populate(state);
     autoboot_read_settings(state);
     init_gskit(state);
 
