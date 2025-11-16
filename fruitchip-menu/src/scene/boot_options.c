@@ -137,6 +137,9 @@ void scene_switch_to_options(struct state *state, u8 app_idx)
     scene_state.list.start_item_idx = 0;
     scene_state.list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
 
+    modchip_settings_get(MODCHIP_SETTINGS_MENU_OSDSYS_SETTINGS, &state->osdsys.value);
+    scene_state.settings.value = state->osdsys.value;
+
     struct list_item item;
     u32 attr = state->apps_attr[app_idx];
 
@@ -159,8 +162,6 @@ void scene_switch_to_options(struct state *state, u8 app_idx)
         scene_state.item_idx_osdsys_skip_hdd = list_push_item(&scene_state.list, &item);
     }
 
-    modchip_settings_get(MODCHIP_SETTINGS_MENU_OSDSYS_SETTINGS, &state->osdsys.value);
-    scene_state.settings.value = state->osdsys.value;
 
     struct scene scene = {
         .input_handler = scene_input_handler_options,
