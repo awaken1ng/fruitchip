@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
+include(../fruitchip-fw-board/board_configuration.cmake)
+
 set(PICO_COMPILER "pico_arm_cortex_m0plus_clang")
 include(../pico-sdk/pico_sdk_init.cmake)
 
@@ -10,8 +12,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 pico_sdk_init()
-
-include(../fruitchip-fw-board/board_configuration.cmake)
 
 add_executable(fruitchip-fw-bootloader
     src/main.c

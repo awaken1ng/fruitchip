@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
+include(../fruitchip-fw-board/board_configuration.cmake)
+
 set(PICO_USE_FASTEST_SUPPORTED_CLOCK 1)
 set(PICO_COMPILER "pico_arm_cortex_m0plus_clang")
 include(../pico-sdk/pico_sdk_init.cmake)
@@ -13,8 +15,6 @@ endif()
 set(CMAKE_C_STANDARD 23)
 
 pico_sdk_init()
-
-include(../fruitchip-fw-board/board_configuration.cmake)
 
 add_executable(fruitchip-fw
     lib/fnv/hash_64a.c
