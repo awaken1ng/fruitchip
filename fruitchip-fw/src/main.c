@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 #include <hardware/clocks.h>
-#include <pico/stdio_rtt.h>
-#include <pico/stdio_uart.h>
+#include <pico/stdio.h>
 #include <pico/status_led.h>
 
 #include <boot_rom/handler.h>
