@@ -59,7 +59,11 @@ inline static void boot_rom_data_out_init()
     pio_sm_claim(pio0, BOOT_ROM_DATA_OUT_SM);
 
     // load programs in specific order to match the statically calculated offsets
+#ifdef PICO_DEFAULT_LED_PIN
+    int offset = pio_add_program(pio0, &boot_rom_read_sniffer_with_led_program);
+#else
     int offset = pio_add_program(pio0, &boot_rom_read_sniffer_program);
+#endif
     boot_rom_read_sniffer_sm_init_and_start(pio0, BOOT_ROM_READ_SNIFFER_SM, boot_rom_read_sniffer_offset);
     if (boot_rom_read_sniffer_offset != offset) panic("Read sniffer loaded at unexpected offset");
 
@@ -67,7 +71,11 @@ inline static void boot_rom_data_out_init()
     boot_rom_write_sniffer_sm_init_and_start(pio0, BOOT_ROM_WRITE_SNIFFER_SM, boot_rom_write_sniffer_offset);
     if (boot_rom_write_sniffer_offset != offset) panic("Write sniffer loaded at unexpected offset");
 
+#ifdef PICO_DEFAULT_LED_PIN
+    offset = pio_add_program(pio0, &boot_rom_data_out_with_led_program);
+#else
     offset = pio_add_program(pio0, &boot_rom_data_out_program);
+#endif
     boot_rom_data_out_sm_init(pio0, BOOT_ROM_DATA_OUT_SM, boot_rom_data_out_offset);
     if (boot_rom_data_out_offset != offset) panic("Data out loaded at unexpected offset");
 

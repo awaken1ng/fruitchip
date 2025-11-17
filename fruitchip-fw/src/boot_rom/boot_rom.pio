@@ -6,10 +6,23 @@
 
 // MX29LV320E is used in a boot rom replacement flex board, so it appears to be compatible
 
-.program boot_rom_read_sniffer
+.program boot_rom_read_sniffer_with_led
 .side_set 1 opt
     mov osr null // prepare to switch OUT (Q0-Q7) to input
     out pindirs, 8 side 0 // set OUT (Q0-Q7) to 0 (input), SIDE (LED) to 0 (off)
+.wrap_target
+ce_high:
+    wait 0 gpio ${BOOT_ROM_OE_PIN} [5] // 20.83 ns @ 240 MHz
+    jmp pin ce_high
+ce_low:
+    in pins, 8
+    wait 1 gpio ${BOOT_ROM_OE_PIN}
+.wrap
+
+.program boot_rom_read_sniffer
+.side_set 1 opt
+    mov osr null // prepare to switch OUT (Q0-Q7) to input
+    out pindirs, 8 // set OUT (Q0-Q7) to 0 (input)
 .wrap_target
 ce_high:
     wait 0 gpio ${BOOT_ROM_OE_PIN} [5] // 20.83 ns @ 240 MHz
@@ -47,9 +60,32 @@ oe_high:
 // DMA to TX FIFO is padded by dummy value,
 // when it's pulled into OSR, FIFO becomes empty,
 // which signals IRQ to stop the SM
-.program boot_rom_data_out
+.program boot_rom_data_out_with_led
 .side_set 1 opt
     mov osr !null side 1 // prepare to switch OUT (Q0-Q7) to output, set SIDE (LED) to 1 (on)
+    out null, 24 // only need 8 bits, discard the rest of OSR
+ce_high1:
+    wait 0 gpio ${BOOT_ROM_OE_PIN}
+    jmp pin ce_high1
+    out pindirs, 8  // set OUT (Q0-Q7) to 1 (output)
+    pull ifempty block
+.wrap_target
+    out pins, 8
+    pull ifempty block
+    wait 1 gpio ${BOOT_ROM_OE_PIN}
+ce_high2:
+    wait 0 gpio ${BOOT_ROM_OE_PIN}
+    jmp pin ce_high2
+    // if wait for IRQ here, firts byte is sampled twice somehow
+    // if we don't, then there's a race for IRQ to stop data out and switch pindirs
+    // before OE goes up and PS2 samples the dummy byte,
+    // thankfully it seems to be happening fast enough
+    irq nowait BOOT_ROM_BYTE_OUT_IRQ
+.wrap
+
+.program boot_rom_data_out
+.side_set 1 opt
+    mov osr !null // prepare to switch OUT (Q0-Q7) to output
     out null, 24 // only need 8 bits, discard the rest of OSR
 ce_high1:
     wait 0 gpio ${BOOT_ROM_OE_PIN}
@@ -99,7 +135,6 @@ static inline void boot_rom_pio_gpio_init(PIO pio)
 static inline void boot_rom_read_sniffer_sm_init_and_start(PIO pio, uint sm, uint offset)
 {
     boot_rom_pio_gpio_init(pio);
-    pio_gpio_init(pio, PICO_DEFAULT_LED_PIN);
 
     pio_sm_config cfg = boot_rom_read_sniffer_program_get_default_config(offset);
 
@@ -109,12 +144,16 @@ static inline void boot_rom_read_sniffer_sm_init_and_start(PIO pio, uint sm, uin
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_RX);
 
     sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_CE_PIN});
-    sm_config_set_sideset_pin_base(&cfg, PICO_DEFAULT_LED_PIN);
 
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
+
+#ifdef PICO_DEFAULT_LED_PIN
+    pio_gpio_init(pio, PICO_DEFAULT_LED_PIN);
+    sm_config_set_sideset_pin_base(&cfg, PICO_DEFAULT_LED_PIN);
     pio_sm_set_consecutive_pindirs(pio, sm, PICO_DEFAULT_LED_PIN, 1, GPIO_OUT);
+#endif
 
     pio_sm_init(pio, sm, offset, &cfg);
     pio_sm_set_enabled(pio, sm, true);
@@ -143,7 +182,6 @@ static inline void boot_rom_write_sniffer_sm_init_and_start(PIO pio, uint sm, ui
 static inline void boot_rom_data_out_sm_init(PIO pio, uint sm, uint offset)
 {
     boot_rom_pio_gpio_init(pio);
-    pio_gpio_init(pio, PICO_DEFAULT_LED_PIN);
 
     pio_sm_config cfg = boot_rom_data_out_program_get_default_config(offset);
 
@@ -153,14 +191,17 @@ static inline void boot_rom_data_out_sm_init(PIO pio, uint sm, uint offset)
     sm_config_set_fifo_join(&cfg, PIO_FIFO_JOIN_TX);
 
     sm_config_set_jmp_pin(&cfg, ${BOOT_ROM_CE_PIN});
-    sm_config_set_sideset_pin_base(&cfg, PICO_DEFAULT_LED_PIN);
-
 
     // start data pins in input, `boot_rom_data_pindirs_switcher` will switch direction as needed
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_Q0_PIN}, 8, GPIO_IN);
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_CE_PIN}, 1, GPIO_IN);
     pio_sm_set_consecutive_pindirs(pio, sm, ${BOOT_ROM_OE_PIN}, 1, GPIO_IN);
+
+#ifdef PICO_DEFAULT_LED_PIN
+    pio_gpio_init(pio, PICO_DEFAULT_LED_PIN);
+    sm_config_set_sideset_pin_base(&cfg, PICO_DEFAULT_LED_PIN);
     pio_sm_set_consecutive_pindirs(pio, sm, PICO_DEFAULT_LED_PIN, 1, GPIO_OUT);
+#endif
 
     pio_sm_init(pio, sm, offset, &cfg);
     pio_sm_set_enabled(pio, sm, false);
