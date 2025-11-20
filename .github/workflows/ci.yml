@@ -28,7 +28,7 @@ jobs:
           submodules: 'recursive'
 
       - run: |
-          cmake -B build build -DBUILD_PS2=1 -DBUILD_ARM=0
+          cmake -B build build -DBUILD_PS2=1 -DBUILD_ARM=0 -DBOARD=waveshare-rp2040-tiny
           cmake --build build
 
       - uses: actions/upload-artifact@v5
@@ -57,7 +57,7 @@ jobs:
 
       - run: |
           export PATH=/opt/ATfE-20.1.0-Linux-x86_64/bin:$PATH
-          cmake -B build build -DBUILD_PS2=0 -DBUILD_ARM=1
+          cmake -B build build -DBUILD_PS2=0 -DBUILD_ARM=1 -DBOARD=waveshare-rp2040-tiny
 
       - uses: actions/download-artifact@v6
         with:

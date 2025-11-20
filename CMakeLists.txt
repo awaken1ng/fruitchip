@@ -10,7 +10,9 @@ set(LOADER_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/loader)
 set(FWFS_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/fwfs)
 set(MENU_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/menu)
 
-set(BOARD "yd-rp2040")
+if(NOT DEFINED BOARD)
+    message(FATAL_ERROR "board not selected")
+endif()
 
 if(NOT DEFINED BUILD_PS2)
     set(BUILD_PS2 1)
