@@ -78,7 +78,10 @@ inline static void boot_rom_data_out_init()
 #endif
     boot_rom_data_out_sm_init(pio0, BOOT_ROM_DATA_OUT_SM, boot_rom_data_out_offset);
     if (boot_rom_data_out_offset != offset) panic("Data out loaded at unexpected offset");
+}
 
+inline static void boot_rom_data_out_init_dma()
+{
     dma_channel_config dma_tx_status_conf;
     dma_channel_claim(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN);
     dma_tx_status_conf = dma_channel_get_default_config(BOOT_ROM_DATA_OUT_STATUS_DMA_CHAN);

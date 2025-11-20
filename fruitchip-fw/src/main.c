@@ -1,5 +1,5 @@
-#include <stdio.h>
 
+#include <pico/multicore.h>
 #include <hardware/clocks.h>
 #include <hardware/pll.h>
 #include <pico/stdio.h>
@@ -12,7 +12,7 @@
 #include "panic.h"
 #include "version.h"
 
-int __time_critical_func(main)()
+void __time_critical_func(main_core1)()
 {
     const uint32_t hz = 240;
 
@@ -33,7 +33,7 @@ int __time_critical_func(main)()
     printf("rev: %s\n", GIT_REV);
     printf("flash size: 0x%x\n", PICO_FLASH_SIZE_BYTES);
 
-    boot_rom_data_out_init();
+    boot_rom_data_out_init_dma();
 
     // status led claims unused SM for WS2812, call it after claiming SMs for data out
     status_led_init();
@@ -51,8 +51,13 @@ int __time_critical_func(main)()
     }
 
     reset_init_irq();
+}
 
-    printf("core0: entering loop\n");
+int __time_critical_func(main)()
+{
+    multicore_launch_core1(main_core1);
+    boot_rom_data_out_init();
+
     while (true)
     {
         if (!pio_sm_is_rx_fifo_empty(pio0, BOOT_ROM_READ_SNIFFER_SM))
