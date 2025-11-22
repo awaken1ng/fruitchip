@@ -7,3 +7,6 @@
 [submodule "fruitchip-fw-apps/osdmenu"]
 	path = fruitchip-fw-apps/osdmenu
 	url = https://github.com/pcm720/OSDMenu.git
+[submodule "fruitchip-fw-apps/ps2link"]
+	path = fruitchip-fw-apps/ps2link
+	url = https://github.com/ps2dev/ps2link.git

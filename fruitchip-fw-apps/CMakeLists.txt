@@ -45,12 +45,21 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2link.elf
+    COMMAND make clean all
+    COMMAND cmake -E copy bin/PS2LINK.ELF ${CMAKE_CURRENT_BINARY_DIR}/ps2link.elf
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ps2link
+)
+
+add_custom_command(
+    OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
         apps/_always_rerun
     DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mx4sio.elf
         ${CMAKE_CURRENT_BINARY_DIR}/ps2bbl_mmce.elf
         ${CMAKE_CURRENT_BINARY_DIR}/osdmenu.elf
+        ${CMAKE_CURRENT_BINARY_DIR}/ps2link.elf
     COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/build_apps_partition.py ${CMAKE_CURRENT_BINARY_DIR}/apps.bin
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
