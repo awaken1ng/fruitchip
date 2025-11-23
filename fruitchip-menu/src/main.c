@@ -19,7 +19,7 @@
 #include "scene/boot_list.h"
 #include "scene/init.h"
 #include "scene/superscene.h"
-#include "boot_list.h"
+#include "apps.h"
 #include "constants.h"
 #include "embedded_irx.h"
 #include "utils.h"

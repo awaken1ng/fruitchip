@@ -13,8 +13,8 @@
 #include "wstring.h"
 #include "constants.h"
 #include "components/list.h"
+#include "apps.h"
 #include "state.h"
-#include "boot_list.h"
 #include "utils.h"
 
 static u32 app_read_attributes(u8 app_idx)

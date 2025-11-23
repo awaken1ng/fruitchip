@@ -29,7 +29,7 @@ add_executable(fruitchip-menu
     src/scene/settings.c
     src/scene/superscene.c
 
-    src/boot_list.c
+    src/apps.c
     ${CMAKE_CURRENT_BINARY_DIR}/src/embedded_irx.c
     src/main.c
     src/update.c

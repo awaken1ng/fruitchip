@@ -9,7 +9,7 @@
 #include "scene/superscene.h"
 #include "scene/message.h"
 #include "update.h"
-#include "boot_list.h"
+#include "apps.h"
 
 #define FLASH_ERASE_BYTE 0xFF
 

@@ -12,7 +12,7 @@
 #include "components/font.h"
 #include "scene/boot_options.h"
 #include "scene/superscene.h"
-#include "boot_list.h"
+#include "apps.h"
 #include "constants.h"
 #include "utils.h"
 

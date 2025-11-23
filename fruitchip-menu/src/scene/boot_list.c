@@ -23,7 +23,7 @@
 #include "scene/message.h"
 #include "scene/settings.h"
 #include "scene/superscene.h"
-#include "boot_list.h"
+#include "apps.h"
 #include "constants.h"
 #include "state.h"
 #include "utils.h"
