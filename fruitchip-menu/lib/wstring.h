@@ -19,7 +19,7 @@ typedef struct wstring
 }
 wstring_t;
 
-inline wstring_t *wstring_new_static(wchar_t *str)
+inline static wstring_t *wstring_new_static(wchar_t *str)
 {
     wstring_t *s = malloc(sizeof(wstring_t));
     s->ty = WSTRING_TYPE_STATIC;
@@ -28,7 +28,7 @@ inline wstring_t *wstring_new_static(wchar_t *str)
 }
 
 // Allocates new `wstring_t` and copies `*str`
-inline wstring_t *wstring_new_copied_wstr(wchar_t *str)
+inline static wstring_t *wstring_new_copied_wstr(wchar_t *str)
 {
     wstring_t *s = malloc(sizeof(wstring_t));
     s->ty = WSTRING_TYPE_ALLOCATED;
@@ -36,7 +36,7 @@ inline wstring_t *wstring_new_copied_wstr(wchar_t *str)
     return s;
 }
 
-inline wstring_t *wstring_new_copied_cstr(const char *str)
+inline static wstring_t *wstring_new_copied_cstr(const char *str)
 {
     mbstate_t mbst;
     memset(&mbst,0,sizeof(mbst));
@@ -53,7 +53,7 @@ inline wstring_t *wstring_new_copied_cstr(const char *str)
 }
 
 // Allocates new `wstring_t` and copies `*str` which is not NULL terminated
-inline wstring_t *wstring_new_copied_str(const char *str, unsigned int len)
+inline static wstring_t *wstring_new_copied_str(const char *str, unsigned int len)
 {
     wstring_t *s = malloc(sizeof(wstring_t));
     s->ty = WSTRING_TYPE_ALLOCATED;
@@ -80,7 +80,7 @@ inline wstring_t *wstring_new_copied_str(const char *str, unsigned int len)
 }
 
 // Allocates new `wstring_t` and "takes ownership" of `*str`
-inline wstring_t *wstring_new_taken(wchar_t *str)
+inline static wstring_t *wstring_new_taken(wchar_t *str)
 {
     wstring_t *s = malloc(sizeof(wstring_t));
     s->ty = WSTRING_TYPE_ALLOCATED;
@@ -88,7 +88,7 @@ inline wstring_t *wstring_new_taken(wchar_t *str)
     return s;
 }
 
-inline wstring_t *wstring_new_allocated(size_t len)
+inline static wstring_t *wstring_new_allocated(size_t len)
 {
     wstring_t *s = malloc(sizeof(wstring_t));
     s->ty = WSTRING_TYPE_ALLOCATED;
@@ -97,12 +97,12 @@ inline wstring_t *wstring_new_allocated(size_t len)
 
 }
 
-inline wchar_t *wstring_data(wstring_t *str)
+inline static wchar_t *wstring_data(wstring_t *str)
 {
     return str->data;
 }
 
-inline void wstring_free(wstring_t *str)
+inline static void wstring_free(wstring_t *str)
 {
     if (!str) return;
 
