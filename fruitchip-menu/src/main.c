@@ -14,6 +14,8 @@
 #include "modchip/flash.h"
 #include "modchip/settings.h"
 
+#include "masswatch.h"
+
 #include "components/font.h"
 #include "input/pad.h"
 #include "scene/boot_list.h"
@@ -103,25 +105,27 @@ int main()
     printf("SifExecModuleBuffer fwfs ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
 
-    // bdm dependencies: loadcore, stdio, sysclib, sysmem, thbase, thevent
     ret = SifExecModuleBuffer(BDM_IRX, BDM_IRX_SIZE, 0, NULL, &ret);
     printf("SifExecModuleBuffer bdm ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
 
-    // bdmfs_fatfs dependencies: bdm, cdvdman, intrman, ioman, stdio, sysclib, sysmem, thsemap
+    ret = SifExecModuleBuffer(MASSWATCH_IRX, MASSWATCH_IRX_SIZE, 0, NULL, &ret);
+    printf("SifExecModuleBuffer masswatch ret=%i mod_res=%i\n", ret, mod_res);
+    if (ret < 0) SleepThread();
+
     ret = SifExecModuleBuffer(BDMFS_FATFS_IRX, BDMFS_FATFS_IRX_SIZE, 0, NULL, &ret);
     printf("SifExecModuleBuffer bdmfs_fatfs ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
 
-    // usbd dependencies: sysmem, loadcore, intrman, stdio, thbase, thevent, thsemap, sysclib
     ret = SifExecModuleBuffer(USBD_IRX, USBD_IRX_SIZE, 0, NULL, &ret);
     printf("SifExecModuleBuffer usbd ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
 
-    // usbmass_bd dependencies: bdm, stdio, sysclib, thbase, thsemap, usbd
     ret = SifExecModuleBuffer(USBMASS_BD_IRX, USBMASS_BD_IRX_SIZE, 0, NULL, &ret);
     printf("SifExecModuleBuffer usbmass_bd ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
+
+    masswatch_init();
 
     struct state *state = malloc(sizeof(*state));
 

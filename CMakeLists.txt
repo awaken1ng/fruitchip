@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(LOADER_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/loader)
 set(FWFS_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/fwfs)
 set(MENU_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/menu)
+set(MASSWATCH_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/masswatch)
 
 if(NOT DEFINED BOARD)
     message(FATAL_ERROR "board not selected")
@@ -60,6 +61,26 @@ if(BUILD_PS2)
     )
 
     ExternalProject_Add(
+        masswatch-iop
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-menu/lib/masswatch/iop"
+        CMAKE_ARGS
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/ps2dev_iop.cmake
+            -DCMAKE_INSTALL_PREFIX=${MASSWATCH_INSTALL_PREFIX}
+        BUILD_ALWAYS 1
+    )
+
+    ExternalProject_Add(
+        masswatch-ee
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-menu/lib/masswatch/ee"
+        CMAKE_ARGS
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
+            -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
+            -DCMAKE_INSTALL_PREFIX=${MASSWATCH_INSTALL_PREFIX}
+        BUILD_ALWAYS 1
+    )
+
+    ExternalProject_Add(
         fruitchip-menu
         SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-menu"
         CMAKE_ARGS
@@ -67,8 +88,11 @@ if(BUILD_PS2)
             -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
             -DCMAKE_INSTALL_PREFIX=${MENU_INSTALL_PREFIX}
             -DFWFS_INSTALL_PREFIX=${FWFS_INSTALL_PREFIX}
+            -DMASSWATCH_INSTALL_PREFIX=${MASSWATCH_INSTALL_PREFIX}
         DEPENDS
             fruitchip-fwfs
+            masswatch-iop
+            masswatch-ee
         BUILD_ALWAYS 1
     )
 endif()
@@ -113,6 +137,8 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
         append_to_compilation_databases(fruitchip-fwfs)
         append_to_compilation_databases(fruitchip-menu)
         append_to_compilation_databases(fruitchip-loader)
+        append_to_compilation_databases(masswatch-iop)
+        append_to_compilation_databases(masswatch-ee)
     endif()
 
     if(BUILD_ARM)

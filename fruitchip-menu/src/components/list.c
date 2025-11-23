@@ -158,6 +158,16 @@ u32 list_push_item(list_state_t *state, const list_item_t item)
     return idx;
 }
 
+void list_remove_item(list_state_t *state, u32 idx)
+{
+    array_list_item_remove_v(state->items, idx, idx + 1);
+
+    while (state->hilite_idx >= list_len(state))
+    {
+        state->hilite_idx -= 1;
+    }
+}
+
 void list_clear(list_state_t *state)
 {
     array_list_item_clear(state->items);

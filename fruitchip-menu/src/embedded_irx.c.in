@@ -36,3 +36,8 @@ uint8_t const USBMASS_BD_IRX[] __attribute__((aligned(16))) = {
     #embed "$ENV{PS2SDK}/iop/irx/usbmass_bd.irx"
 };
 uint32_t const USBMASS_BD_IRX_SIZE = sizeof(USBMASS_BD_IRX);
+
+uint8_t MASSWATCH_IRX[] __attribute__((aligned(16))) = {
+    #embed "${MASSWATCH_INSTALL_PREFIX}/masswatch.irx"
+};
+uint32_t const MASSWATCH_IRX_SIZE = sizeof(MASSWATCH_IRX);

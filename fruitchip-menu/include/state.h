@@ -35,6 +35,9 @@ struct state {
     list_state_t boot_list;
     array_u32_t boot_list_attr;
 
+    bool mass_event_received;
+    u32 rescue_item_idx;
+
     bool autoboot;
     u32 autoboot_item_idx;
     u32 autoboot_delay_sec;

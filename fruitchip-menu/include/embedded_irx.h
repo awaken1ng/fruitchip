@@ -29,3 +29,7 @@ extern const uint32_t USBD_IRX_SIZE;
 // usbmass_bd dependencies: bdm, stdio, sysclib, thbase, thsemap, usbd
 extern uint8_t USBMASS_BD_IRX[];
 extern const uint32_t USBMASS_BD_IRX_SIZE;
+
+// masswatch dependencies: stdio, sbusintr, usbmass
+extern uint8_t MASSWATCH_IRX[];
+extern const uint32_t MASSWATCH_IRX_SIZE;

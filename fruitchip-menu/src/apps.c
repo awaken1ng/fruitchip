@@ -60,41 +60,22 @@ static u8 *apps_read_index()
     return NULL;
 }
 
-static void apps_attr_populate(struct state *state)
-{
-    array_u32_clear(state->boot_list_attr);
-
-    u8 apps_count = list_len(&state->boot_list); // includes OSDSYS
-    array_u32_init(state->boot_list_attr);
-
-    array_u32_push_back(state->boot_list_attr, MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK | MODCHIP_APPS_ATTR_OSDSYS); // OSDSYS
-    for (u8 app_idx = 1; app_idx < apps_count; app_idx++)
-    {
-        u32 attr = app_read_attributes(app_idx);
-        if (attr < 0)
-        {
-            print_debug("failed to read attributes for app idx %i: %i", app_idx, attr);
-            attr = 0;
-        }
-
-        print_debug("app_idx %i attr 0x%x\n", app_idx, attr);
-        array_u32_push_back(state->boot_list_attr, attr);
-    }
-}
-
 bool apps_list_populate(struct state *state)
 {
     bool ret = false;
 
     list_clear(&state->boot_list);
+    array_u32_clear(state->boot_list_attr);
 
     state->boot_list.hilite_idx = BOOT_ITEM_OSDSYS;
     state->boot_list.start_item_idx = 0;
     state->boot_list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
 
+    array_u32_init(state->boot_list_attr);
+
     struct list_item list_item;
     list_item.left_text = wstring_new_static(L"OSDSYS");
-    list_push_item(&state->boot_list, list_item);
+    apps_list_push_item(state, list_item, MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK | MODCHIP_APPS_ATTR_OSDSYS);
 
     u8 *apps_index = apps_read_index();
     if (!apps_index)
@@ -108,7 +89,15 @@ bool apps_list_populate(struct state *state)
     {
         u8 name_len = *ptr++;
         list_item.left_text = wstring_new_copied_str((char *)ptr, name_len);
-        list_push_item(&state->boot_list, list_item);
+
+        u8 app_idx = idx + 1;
+        u32 attr = app_read_attributes(app_idx);
+        if (attr < 0)
+        {
+            print_debug("failed to read attributes for app idx %i: %i", app_idx, attr);
+            attr = 0;
+        }
+        apps_list_push_item(state, list_item, attr);
 
         ptr += name_len;
     }
@@ -123,8 +112,20 @@ bool apps_list_populate(struct state *state)
     ret = true;
 
 exit:
-    apps_attr_populate(state);
     return ret;
+}
+
+u32 apps_list_push_item(struct state *state, list_item_t item, u32 attr)
+{
+    u32 idx = list_push_item(&state->boot_list, item);
+    array_u32_push_back(state->boot_list_attr, attr);
+    return idx;
+}
+
+void apps_list_remove_item(struct state *state, u32 idx)
+{
+    list_remove_item(&state->boot_list, idx);
+    array_u32_remove_v(state->boot_list_attr, idx, idx + 1);
 }
 
 bool apps_attr_is_configurable(u32 attr)

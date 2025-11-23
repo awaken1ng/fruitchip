@@ -44,6 +44,7 @@ target_include_directories(fruitchip-menu
         ${CMAKE_CURRENT_BINARY_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../fruitchip-include
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/masswatch/ee/include
 )
 
 target_link_libraries(fruitchip-menu
@@ -55,6 +56,7 @@ target_link_libraries(fruitchip-menu
     z
     tiff
     pad
+    ${MASSWATCH_INSTALL_PREFIX}/${CMAKE_SHARED_LIBRARY_PREFIX}masswatch-ee.a
 )
 
 if (${IS_RELEASE_BUILD})

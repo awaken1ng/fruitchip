@@ -1,0 +1,18 @@
+bdm_IMPORTS_start
+I_bdm_RegisterCallback
+bdm_IMPORTS_end
+
+#ifndef NDEBUG
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+#endif
+
+sifcmd_IMPORTS_start
+I_sceSifSendCmd
+I_sceSifInitCmd
+sifcmd_IMPORTS_end
+
+sifman_IMPORTS_start
+I_sceSifDmaStat
+sifman_IMPORTS_end

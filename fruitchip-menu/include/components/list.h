@@ -46,4 +46,5 @@ void list_draw_items(GSGLOBAL *gs, list_state_t *state);
 
 u32 list_push_item(list_state_t *state, const list_item_t item);
 void list_clear(list_state_t *state);
+void list_remove_item(list_state_t *state, u32 item_idx);
 size_t list_len(list_state_t *state);
