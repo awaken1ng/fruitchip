@@ -24,6 +24,7 @@
 #include "apps.h"
 #include "constants.h"
 #include "embedded_irx.h"
+#include "init.h"
 #include "utils.h"
 
 static void autoboot_read_settings(struct state *state)
@@ -124,6 +125,8 @@ int main()
     ret = SifExecModuleBuffer(USBMASS_BD_IRX, USBMASS_BD_IRX_SIZE, 0, NULL, &ret);
     printf("SifExecModuleBuffer usbmass_bd ret=%i mod_res=%i\n", ret, mod_res);
     if (ret < 0) SleepThread();
+
+    init_osd_config();
 
     masswatch_init();
 

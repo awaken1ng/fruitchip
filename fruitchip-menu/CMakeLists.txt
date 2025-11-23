@@ -31,6 +31,7 @@ add_executable(fruitchip-menu
 
     src/apps.c
     ${CMAKE_CURRENT_BINARY_DIR}/src/embedded_irx.c
+    src/init.c
     src/main.c
     src/update.c
     src/utils.c
