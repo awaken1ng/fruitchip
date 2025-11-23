@@ -76,8 +76,9 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/_version.cpp  # always re-run before the build
     COMMAND
-        ${CMAKE_COMMAND} -P
-        ${CMAKE_CURRENT_SOURCE_DIR}/../version.cmake
+        ${CMAKE_COMMAND}
+        -DPATH=${CMAKE_CURRENT_SOURCE_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/../version.cmake
 )
 
 set_property(TARGET fruitchip-fw-bootloader APPEND_STRING PROPERTY LINK_FLAGS "-Wl,--print-memory-usage")

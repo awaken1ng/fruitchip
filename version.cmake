@@ -1,7 +1,7 @@
 # https://www.mattkeeter.com/blog/2018-01-06-versioning/
 
 execute_process(
-    COMMAND git log --pretty=format:'%h' -n 1
+    COMMAND git log --pretty=format:'%h' -n 1 ${PATH}
     OUTPUT_VARIABLE GIT_REV
     ERROR_QUIET
 )
@@ -16,11 +16,11 @@ if ("${GIT_REV}" STREQUAL "")
     set(GIT_BRANCH "N/A")
 else()
     execute_process(
-        COMMAND bash -c "git diff --quiet --exit-code || echo +"
+        COMMAND bash -c "git diff --quiet --exit-code -- ${PATH} || echo +"
         OUTPUT_VARIABLE GIT_DIFF
     )
     execute_process(
-        COMMAND git describe --exact-match --tags
+        COMMAND git describe --exact-match --tags ${PATH}
         OUTPUT_VARIABLE GIT_TAG ERROR_QUIET
     )
     execute_process(
@@ -39,12 +39,12 @@ set(VERSION "const char* GIT_REV=\"${GIT_REV}${GIT_DIFF}\";
 const char* GIT_TAG=\"${GIT_TAG}\";
 const char* GIT_BRANCH=\"${GIT_BRANCH}\";")
 
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp)
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp VERSION_)
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
+    file(READ ${CMAKE_CURRENT_BINARY_DIR}/version.cpp VERSION_)
 else()
     set(VERSION_ "")
 endif()
 
 if (NOT "${VERSION}" STREQUAL "${VERSION_}")
-    file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp "${VERSION}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version.cpp "${VERSION}")
 endif()
