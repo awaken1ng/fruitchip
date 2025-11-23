@@ -181,11 +181,13 @@ void scene_switch_to_settings_about_update_apps(struct state *state)
     state->update_complete = false;
     state->update_in_progress = false;
 
+    array_list_item_init(update_state.list.items);
     update_state.list.hilite_idx = 0;
     update_state.list.start_item_idx = 3;
     update_state.list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
 
     list_item_t item;
+    list_item_init(&item);
 
     item.left_text = wstring_new_static(L"No");
     item.right_text = NULL;

@@ -149,9 +149,6 @@ void list_draw_items(GSGLOBAL *gs, list_state_t *state)
 
 u32 list_push_item(list_state_t *state, const list_item_t item)
 {
-    if (!list_len(state))
-        array_list_item_init(state->items);
-
     u32 idx = list_len(state);
     array_list_item_push_back(state->items, item);
 

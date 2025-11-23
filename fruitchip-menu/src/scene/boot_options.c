@@ -132,6 +132,7 @@ void scene_switch_to_options(struct state *state, u8 app_idx)
 
     scene_state.header = wstring_new_copied_wstr(header);
 
+    array_list_item_init(scene_state.list.items);
     scene_state.list.hilite_idx = 0;
     scene_state.list.start_item_idx = 0;
     scene_state.list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
@@ -140,6 +141,7 @@ void scene_switch_to_options(struct state *state, u8 app_idx)
     scene_state.settings.value = state->osdsys.value;
 
     list_item_t item;
+    list_item_init(&item);
     u32 attr = *array_u32_get(state->boot_list_attr, app_idx);
 
     if (attr & MODCHIP_APPS_ATTR_OSDSYS)

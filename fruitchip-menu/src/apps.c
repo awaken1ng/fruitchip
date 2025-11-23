@@ -67,13 +67,15 @@ bool apps_list_populate(struct state *state)
     list_clear(&state->boot_list);
     array_u32_clear(state->boot_list_attr);
 
+    array_list_item_init(state->boot_list.items);
     state->boot_list.hilite_idx = BOOT_ITEM_OSDSYS;
     state->boot_list.start_item_idx = 0;
     state->boot_list.max_items = MAX_LIST_ITEMS_ON_SCREEN;
 
     array_u32_init(state->boot_list_attr);
 
-    struct list_item list_item;
+    list_item_t list_item;
+    list_item_init(&list_item);
     list_item.left_text = wstring_new_static(L"OSDSYS");
     apps_list_push_item(state, list_item, MODCHIP_APPS_ATTR_DISABLE_NEXT_OSDSYS_HOOK | MODCHIP_APPS_ATTR_OSDSYS);
 

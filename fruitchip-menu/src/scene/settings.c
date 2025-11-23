@@ -194,7 +194,10 @@ static void scene_paint_handler_settings(struct state *state)
 
 void scene_switch_to_settings(struct state *state)
 {
+    array_list_item_init(list.items);
+
     list_item_t item;
+    list_item_init(&item);
 
     item.left_text = wstring_new_static(L"Autoboot");
     item.right_text = NULL;

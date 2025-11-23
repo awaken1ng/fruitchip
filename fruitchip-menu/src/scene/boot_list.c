@@ -97,6 +97,7 @@ static void add_or_remove_rescue_elf(struct state *state)
         close(fd);
 
         list_item_t list_item;
+        list_item_init(&list_item);
         list_item.left_text = wstring_new_static(L"mass:/RESCUE.ELF");
 
         state->rescue_item_idx = apps_list_push_item(
