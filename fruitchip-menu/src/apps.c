@@ -126,3 +126,13 @@ exit:
     apps_attr_populate(state);
     return ret;
 }
+
+bool apps_attr_is_configurable(u32 attr)
+{
+    bool ret = false;
+
+    if (attr & MODCHIP_APPS_ATTR_OSDSYS)
+        ret |= true;
+
+    return ret;
+}

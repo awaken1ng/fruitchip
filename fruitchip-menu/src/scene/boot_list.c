@@ -132,7 +132,7 @@ void scene_input_handler_boot_list(struct state *state, int input)
     {
         u8 app_idx = state->boot_list.hilite_idx;
         u32 attr = *array_u32_cget(state->boot_list_attr, app_idx);
-        if (attr)
+        if (apps_attr_is_configurable(attr))
             scene_switch_to_options(state, app_idx);
     }
     else if (input & PAD_SQUARE)
@@ -183,7 +183,7 @@ static void draw_button_guide(struct state *state)
 
     state->button_guide.start = L"Settings";
 
-    if (attr)
+    if (apps_attr_is_configurable(attr))
         state->button_guide.triangle = L"Options";
 
     if (!is_autoboot_item_hilited(state))
