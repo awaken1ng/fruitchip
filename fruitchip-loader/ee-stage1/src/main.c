@@ -23,7 +23,10 @@ inline static void panic(const char *msg)
 
 inline static void modchip_cmd_or_panic(u32 cmd)
 {
-    if (!modchip_cmd(cmd)) panic("EE1: cmd failed");
+    modchip_poke_u32(cmd);
+    u32 ret = modchip_peek_u32();
+    if (ret == BOOT_ROM_ADDR_VALUE) panic("EE1: cmd no response");
+    if (ret != MODCHIP_CMD_RESULT_OK) panic("EE1: cmd bad crc");
 }
 
 void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int argc, char** argv)
