@@ -42,7 +42,11 @@ void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int arg
     u32 ee_stage1_crc = *(uiptr *)(EE_STAGE_1_ADDR + ee_stage1_size);
     u32 crc = crc32((void *)EE_STAGE_1_ADDR, ee_stage1_size);
 #ifndef NDEBUG
-    sio_putsn("EE1: crc 0x");
+    sio_putsn("EE1: size 0x");
+    sio_putxn(ee_stage1_size);
+    sio_putsn(" crc 0x");
+    sio_putxn(ee_stage1_crc);
+    sio_putsn(" 0x");
     sio_putxn(crc);
     if (crc == ee_stage1_crc) sio_puts(" ok");
 #endif
