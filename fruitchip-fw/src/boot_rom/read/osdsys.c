@@ -25,7 +25,7 @@ void __time_critical_func(handle_read_hook_osdsys)(uint8_t r)
     }
 
     if (!disable_next_osdsys_hook)
-        boot_rom_data_out_start_data_without_status_code(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE, true);
+        boot_rom_data_out_start_data_without_status_code(true);
 
     read_handler = handle_read_find_osdsys_elf;
     disable_next_osdsys_hook = false;
@@ -54,7 +54,11 @@ void __time_critical_func(handle_read_find_osdsys_syscall_table)(uint8_t r)
         case 8: if (r != 0x08) { goto exit; } break;
         case 9: if (r != 0x00) { goto exit; } break;
         case 10: if (r != 0xE0) { goto exit; } break;
-        case 11: if (r != 0x03) { goto exit; } break;
+        case 11: if (r != 0x03) { goto exit; }
+            // setup data out early
+            // helps avoding delay with data out start on cold boot
+            boot_rom_data_out_set_data(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE);
+            break;
 
         case 12:
         case 13: if (r != 0x00) { goto exit; } break;
