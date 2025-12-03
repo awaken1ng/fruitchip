@@ -2,11 +2,12 @@
 
 #include <pico/stdlib.h>
 #include <pico/bootrom.h>
-#include <pico/status_led.h>
 #include <hardware/dma.h>
 #include <hardware/watchdog.h>
 #include <hardware/flash.h>
 #include <hardware/sync.h>
+
+#include "colored_status_led.h"
 
 #include "modchip/update.h"
 #include "version.h"
@@ -206,7 +207,7 @@ int __time_critical_func(main)()
     printf("fruitchip bootloader\n");
     printf("rev: %s\n", GIT_REV);
 
-    status_led_init();
+    colored_status_led_init(RGB_PIO, RGB_SM);
     colored_status_led_set_on_with_color(RGB_OK_BOOTLOADER);
 
     dma_init_crc();

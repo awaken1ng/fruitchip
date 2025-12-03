@@ -3,7 +3,8 @@
 #include <hardware/clocks.h>
 #include <hardware/pll.h>
 #include <pico/stdio.h>
-#include <pico/status_led.h>
+
+#include "colored_status_led.h"
 
 #include <boot_rom/handler.h>
 #include "reset.h"
@@ -35,8 +36,7 @@ void __time_critical_func(main_core1)()
 
     boot_rom_data_out_init_dma();
 
-    // status led claims unused SM for WS2812, call it after claiming SMs for data out
-    status_led_init();
+    colored_status_led_init(RGB_PIO, RGB_SM);
 
     settings_init();
 

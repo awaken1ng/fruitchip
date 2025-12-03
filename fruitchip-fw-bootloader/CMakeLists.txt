@@ -18,10 +18,15 @@ add_executable(fruitchip-fw-bootloader
     ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../pico-status-led
+    ${CMAKE_CURRENT_BINARY_DIR}/pico-status-led
+)
+
 target_link_libraries(fruitchip-fw-bootloader
     pico_stdlib
     pico_stdio_rtt
-    pico_status_led
+    status_led
     hardware_dma
     hardware_flash
 )

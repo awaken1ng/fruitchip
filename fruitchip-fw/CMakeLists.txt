@@ -46,6 +46,7 @@ target_include_directories(fruitchip-fw
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/wear_leveling
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/../fruitchip-include
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/status_led/include
 )
 
 target_compile_definitions(fruitchip-fw
@@ -86,11 +87,16 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/src/boot_rom/loader.c
 )
 
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../pico-status-led
+    ${CMAKE_CURRENT_BINARY_DIR}/pico-status-led
+)
+
 target_link_libraries(fruitchip-fw
     pico_stdlib
     pico_stdio_rtt
     pico_multicore
-    pico_status_led
+    status_led
     hardware_pio
     hardware_dma
     hardware_flash
