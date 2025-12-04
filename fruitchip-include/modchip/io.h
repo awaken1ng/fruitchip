@@ -48,6 +48,16 @@ inline static u32 modchip_peek_u32()
     return *(volatile u32 *)BOOT_ROM_ADDR;
 }
 
+inline static void modchip_peek_n(void *dst, u32 size)
+{
+    for (uiptr i = 0; i < size - (size % 4); i += 4)
+        *(u32 *)(dst + i) = modchip_peek_u32();
+
+    for (uiptr i = size - (size % 4); i < size; i += 1)
+        *(u8 *)(dst + i) = modchip_peek_u8();
+
+}
+
 inline static bool modchip_cmd(u32 cmd)
 {
     modchip_poke_u32(cmd);

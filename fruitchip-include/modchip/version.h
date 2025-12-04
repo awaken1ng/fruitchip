@@ -9,8 +9,7 @@ inline static bool modchip_git_rev(char *dst)
     if (modchip_peek_u32() != MODCHIP_CMD_RESULT_OK)
         return false;
 
-    *(u32 *)(dst + 0) = modchip_peek_u32();
-    *(u32 *)(dst + 4) = modchip_peek_u32();
+    modchip_peek_n(dst, 8);
 
     return true;
 }

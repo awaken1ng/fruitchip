@@ -36,11 +36,7 @@ inline static s32 modchip_stage3_read(u32 offset, u32 size, void *dst, bool with
     else if (r != MODCHIP_CMD_RESULT_OK)
         return -EINVAL;
 
-    for (uiptr i = 0; i < size - (size % 4); i += 4)
-        *(u32 *)(dst + i) = modchip_peek_u32();
-
-    for (uiptr i = size - (size % 4); i < size; i += 1)
-        *(u8 *)(dst + i) = modchip_peek_u8();
+    modchip_peek_n(dst, size);
 
     if (with_crc)
     {
@@ -74,11 +70,7 @@ inline static s32 modchip_apps_read(u32 offset, u32 size, u8 app_idx, void *dst,
     else if (r != MODCHIP_CMD_RESULT_OK)
         return -EINVAL;
 
-    for (uiptr i = 0; i < size - (size % 4); i += 4)
-        *(u32 *)(dst + i) = modchip_peek_u32();
-
-    for (uiptr i = size - (size % 4); i < size; i += 1)
-        *(u8 *)(dst + i) = modchip_peek_u8();
+    modchip_peek_n(dst, size);
 
     if (with_crc)
     {
