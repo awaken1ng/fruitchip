@@ -36,6 +36,7 @@ jobs:
           name: build-ps2
           path: |
             build/fruitchip-fw-apps-prefix/src/fruitchip-fw-apps-build/*.uf2
+            build/fruitchip-test-ps2-prefix/src/fruitchip-test-ps2-build/fruitchip-test-ps2-packed.elf
             build/fwfs/*
             build/loader/*
             build/menu/*

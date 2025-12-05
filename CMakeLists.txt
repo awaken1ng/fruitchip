@@ -95,6 +95,17 @@ if(BUILD_PS2)
             masswatch-ee
         BUILD_ALWAYS 1
     )
+
+    ExternalProject_Add(
+        fruitchip-test-ps2
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-test-ps2"
+        CMAKE_ARGS
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
+            -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
+            -DFWFS_INSTALL_PREFIX=${FWFS_INSTALL_PREFIX}
+        INSTALL_COMMAND cmake -E true
+        BUILD_ALWAYS 1
+    )
 endif()
 
 if(BUILD_ARM)
@@ -139,6 +150,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
         append_to_compilation_databases(fruitchip-loader)
         append_to_compilation_databases(masswatch-iop)
         append_to_compilation_databases(masswatch-ee)
+        append_to_compilation_databases(fruitchip-test-ps2)
     endif()
 
     if(BUILD_ARM)
