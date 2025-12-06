@@ -1,0 +1,23 @@
+# see pico-sdk/src/boards/include/boards for a list of supported boards
+set(PICO_BOARD pico)
+
+# 2, 4, 8 or 16 MB
+set(FLASH_SIZE_MB 2)
+
+# Q0-Q7 pins must be consecutive
+set(BOOT_ROM_Q0_PIN 0)
+set(BOOT_ROM_CE_PIN 8)
+set(BOOT_ROM_OE_PIN 9)
+set(RST_PIN 10)
+
+# if defined, uses LED for data out activity
+# set(PICO_DEFAULT_LED_PIN 25)
+
+# if defined, uses RGB LED for initalization status
+# set(PICO_DEFAULT_WS2812_PIN 23)
+
+# if defined, enables UART support
+# selected pin must support TX/RX function, see section 1.4.3 of datasheet
+# https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+# set(UART_TX_PIN 12)
+# set(UART_RX_PIN 13)
