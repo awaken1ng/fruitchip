@@ -4,6 +4,7 @@
 
 #include "modchip/version.h"
 
+#include "scene/message.h"
 #include "scene/settings.h"
 #include "git_version.h"
 
@@ -66,6 +67,12 @@ static void scene_paint_handler_settings(struct state *state)
 
 void scene_switch_to_settings_about(struct state *state)
 {
+    struct scene scene = {
+        .input_handler = scene_input_handler_settings,
+        .paint_handler = scene_paint_handler_settings,
+    };
+    superscene_push_scene(&scene);
+
     array_list_item_init(list.items);
 
     list_item_t item;
@@ -77,8 +84,12 @@ void scene_switch_to_settings_about(struct state *state)
 
     char fw_git_rev[9] = "N/A";
     char bootloader_git_rev[9] = "N/A";
-    modchip_fw_git_rev(fw_git_rev);
-    modchip_bootloader_git_rev(bootloader_git_rev);
+
+    if (!modchip_fw_git_rev(fw_git_rev))
+        scene_switch_to_message(state, L"Failed to get firmware version");
+
+    if (!modchip_bootloader_git_rev(bootloader_git_rev))
+        scene_switch_to_message(state, L"Failed to get bootloader version");
 
     item.left_text = wstring_new_static(L"Modchip FW version");
     item.right_text = wstring_new_copied_cstr(fw_git_rev);
@@ -95,12 +106,6 @@ void scene_switch_to_settings_about(struct state *state)
     item.left_text = wstring_new_static(L"Update apps");
     item.right_text = wstring_new_static(L">");
     item_idx_update_apps = list_push_item(&list, item);
-
-    struct scene scene = {
-        .input_handler = scene_input_handler_settings,
-        .paint_handler = scene_paint_handler_settings,
-    };
-    superscene_push_scene(&scene);
 
     state->repaint = true;
 }
