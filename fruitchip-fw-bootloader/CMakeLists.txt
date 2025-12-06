@@ -15,7 +15,6 @@ pico_sdk_init()
 
 add_executable(fruitchip-fw-bootloader
     src/main.c
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
 add_subdirectory(
@@ -33,6 +32,8 @@ target_link_libraries(fruitchip-fw-bootloader
 
 target_include_directories(fruitchip-fw-bootloader
     PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../fruitchip-include
 )
 
@@ -76,14 +77,11 @@ configure_file(
     ${CMAKE_BINARY_DIR}/pico_flash_region.ld
 )
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
-        ${CMAKE_CURRENT_BINARY_DIR}/_version.cpp  # always re-run before the build
-    COMMAND
-        ${CMAKE_COMMAND}
-        -DPATH=${CMAKE_CURRENT_SOURCE_DIR}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/../version.cmake
+include(../git_version.cmake)
+
+configure_git_version_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/git_version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/git_version.h
 )
 
 set_property(TARGET fruitchip-fw-bootloader APPEND_STRING PROPERTY LINK_FLAGS "-Wl,--print-memory-usage")

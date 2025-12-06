@@ -5,7 +5,7 @@
 #include "boot_rom/write/version.h"
 #include "boot_rom/data_out.h"
 #include <modchip/cmd.h>
-#include "../../version.h"
+#include "git_version.h"
 
 void __time_critical_func(handle_write_git_rev)(uint8_t w)
 {

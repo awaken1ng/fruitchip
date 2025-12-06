@@ -38,11 +38,11 @@ add_executable(fruitchip-fw
     src/boot_rom/write/version.c
     src/reset.c
     src/settings.c
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
 target_include_directories(fruitchip-fw
     PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/fnv
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/wear_leveling
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -126,14 +126,11 @@ pico_add_uf2_output(fruitchip-fw)
 
 set_property(TARGET fruitchip-fw APPEND_STRING PROPERTY LINK_FLAGS "-Wl,--print-memory-usage")
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
-        ${CMAKE_CURRENT_BINARY_DIR}/_version.cpp  # always re-run before the build
-    COMMAND
-        ${CMAKE_COMMAND}
-        -DPATH=${CMAKE_CURRENT_SOURCE_DIR}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/../version.cmake
+include(../git_version.cmake)
+
+configure_git_version_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/git_version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/git_version.h
 )
 
 configure_file(

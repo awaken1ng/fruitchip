@@ -1,0 +1,3 @@
+#pragma once
+
+static char GIT_REV[] = "${GIT_REV}${GIT_DIFF}";

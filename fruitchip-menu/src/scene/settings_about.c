@@ -5,7 +5,7 @@
 #include "modchip/version.h"
 
 #include "scene/settings.h"
-#include "version.h"
+#include "git_version.h"
 
 static list_state_t list = {
     .start_item_idx = 0,

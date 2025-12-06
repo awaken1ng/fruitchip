@@ -11,7 +11,7 @@
 #include "apps.h"
 #include "settings.h"
 #include "panic.h"
-#include "version.h"
+#include "git_version.h"
 
 void __time_critical_func(main_core1)()
 {

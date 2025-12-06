@@ -35,8 +35,6 @@ add_executable(fruitchip-menu
     src/main.c
     src/update.c
     src/utils.c
-
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
 target_include_directories(fruitchip-menu
@@ -141,14 +139,11 @@ add_dependencies(fruitchip-menu font-dejavu-sans-mono)
 
 # endregion: font
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
-        ${CMAKE_CURRENT_BINARY_DIR}/_version.cpp  # always re-run before the build
-    COMMAND
-        ${CMAKE_COMMAND}
-        -DPATH=${CMAKE_CURRENT_SOURCE_DIR}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/../version.cmake
+include(../git_version.cmake)
+
+configure_git_version_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/git_version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/git_version.h
 )
 
 add_custom_command(

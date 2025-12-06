@@ -13,9 +13,9 @@
 #include "scene/message.h"
 #include "scene/settings.h"
 #include "constants.h"
+#include "git_version.h"
 #include "update.h"
 #include "utils.h"
-#include "version.h"
 
 static struct update_state {
     list_state_t list;
