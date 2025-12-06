@@ -75,7 +75,7 @@ void scene_switch_to_settings_about(struct state *state)
     item_idx_menu_version = list_push_item(&list, item);
 
     char fw_git_rev[9] = "N/A";
-    modchip_git_rev(fw_git_rev);
+    modchip_fw_git_rev(fw_git_rev);
 
     item.left_text = wstring_new_static(L"Modchip FW version");
     item.right_text = wstring_new_copied_cstr(fw_git_rev);

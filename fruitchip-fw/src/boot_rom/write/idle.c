@@ -28,7 +28,8 @@ void __time_critical_func(handle_write_cmd_group0)(uint8_t w)
         assert_and_case(MODCHIP_CMD_READ_APP): write_handler = handle_write_read_apps_partition; break;
         assert_and_case(MODCHIP_CMD_KV_GET): write_handler = handle_write_kv_get; break;
         assert_and_case(MODCHIP_CMD_KV_SET): write_handler = handle_write_kv_set; break;
-        assert_and_case(MODCHIP_CMD_GIT_REV): write_handler = handle_write_git_rev; break;
+        assert_and_case(MODCHIP_CMD_FW_GIT_REV): write_handler = handle_write_fw_git_rev; break;
+        assert_and_case(MODCHIP_CMD_BOOTLOADER_GIT_REV): write_handler = handle_write_bootloader_git_rev; break;
         assert_and_case(MODCHIP_CMD_GET_PARTITION_SIZE): write_handler = handle_write_get_partition_size; break;
         assert_and_case(MODCHIP_CMD_GET_FLASH_SECTOR_SIZE): write_handler = handle_write_get_flash_sector_size; break;
         assert_and_case(MODCHIP_CMD_WRITE_LOCK): write_handler = handle_write_write_lock; break;

@@ -7,14 +7,29 @@
 #include <modchip/cmd.h>
 #include "git_version.h"
 
-void __time_critical_func(handle_write_git_rev)(uint8_t w)
+void __time_critical_func(handle_write_fw_git_rev)(uint8_t w)
 {
     cmd_byte_counter++;
 
     switch (cmd_byte_counter)
     {
-        case 3: if (w != GET_BYTE(MODCHIP_CMD_GIT_REV, 3)) { goto exit; }
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_FW_GIT_REV, 3)) { goto exit; }
             boot_rom_data_out_start_data_with_status_code(MODCHIP_CMD_RESULT_OK, GIT_REV, 8, false);
+exit:
+        [[fallthrough]];
+        default:
+            write_handler = handle_write_idle;
+    }
+}
+
+void __time_critical_func(handle_write_bootloader_git_rev)(uint8_t w)
+{
+    cmd_byte_counter++;
+
+    switch (cmd_byte_counter)
+    {
+        case 3: if (w != GET_BYTE(MODCHIP_CMD_BOOTLOADER_GIT_REV, 3)) { goto exit; }
+            boot_rom_data_out_start_data_with_status_code(MODCHIP_CMD_RESULT_OK, BOOTLOADER_GIT_REV, 8, false);
 exit:
         [[fallthrough]];
         default:
