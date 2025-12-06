@@ -1,19 +1,19 @@
-
 #include <pico/multicore.h>
 #include <hardware/clocks.h>
 #include <hardware/pll.h>
 #include <pico/stdio.h>
 
-#include "binary_info_parser.h"
+#include <binary_info_parser.h>
 
-#include "colored_status_led.h"
+#include <colored_status_led.h>
 
 #include <boot_rom/handler.h>
-#include "reset.h"
-#include "apps.h"
-#include "settings.h"
-#include "panic.h"
-#include "git_version.h"
+#include <apps.h>
+#include <binary_info.h>
+#include <git_version.h>
+#include <panic.h>
+#include <reset.h>
+#include <settings.h>
 
 void __time_critical_func(main_core1)()
 {
