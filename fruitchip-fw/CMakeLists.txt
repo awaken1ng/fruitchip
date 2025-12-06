@@ -22,6 +22,7 @@ add_executable(fruitchip-fw
     lib/wear_leveling/wear_leveling.c
     lib/wear_leveling/wear_leveling_rp2040_flash.c
 
+    src/git_version.c
     src/main.c
     src/boot_rom/handler.c
     src/boot_rom/data_out.c

@@ -4,6 +4,8 @@
 #include <hardware/pll.h>
 #include <pico/stdio.h>
 
+#include "binary_info_parser.h"
+
 #include "colored_status_led.h"
 
 #include <boot_rom/handler.h>
@@ -28,13 +30,19 @@ void __time_critical_func(main_core1)()
 
     clock_configure(clk_peri, 0, CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS, hz * MHZ, hz * MHZ);
 
+    boot_rom_data_out_init_dma();
+
     stdio_init_all();
 
     printf("fruitchip\n");
-    printf("rev: %s\n", GIT_REV);
     printf("flash size: 0x%x\n", PICO_FLASH_SIZE_BYTES);
 
-    boot_rom_data_out_init_dma();
+    printf("fw rev: %s\n", GIT_REV);
+
+    const char *bootloader_git_rev = binary_info_version((void *)XIP_BASE);
+    if (bootloader_git_rev)
+        BOOTLOADER_GIT_REV = bootloader_git_rev;
+    printf("bootloader rev: %s\n", BOOTLOADER_GIT_REV);
 
     colored_status_led_init(RGB_PIO, RGB_SM);
 

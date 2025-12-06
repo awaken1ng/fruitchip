@@ -1,3 +1,5 @@
 #pragma once
 
 static char GIT_REV[] = "${GIT_REV}${GIT_DIFF}";
+
+extern const char *BOOTLOADER_GIT_REV;
