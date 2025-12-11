@@ -1,14 +1,18 @@
 #include <libpad.h>
 
 #include <components/font.h>
+#include "scene/settings.h"
 #include <scene/superscene.h>
 #include <constants.h>
+#include <version.h>
 
 static void scene_input_handler_update_complete(struct state *state, int input)
 {
     if (input & PAD_CIRCLE)
     {
-        superscene_pop_scene();
+        superscene_pop_scene(); // current scene
+        superscene_pop_scene(); // About scene
+        scene_switch_to_settings_about(state);
         state->repaint = true;
     }
 }

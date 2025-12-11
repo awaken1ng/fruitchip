@@ -7,7 +7,7 @@
 #include <scene/settings/update.h>
 #include "scene/message.h"
 #include "scene/settings.h"
-#include "git_version.h"
+#include "version.h"
 
 static list_state_t list = {
     .start_item_idx = 0,
@@ -76,30 +76,27 @@ void scene_switch_to_settings_about(struct state *state)
     scene.paint_handler = scene_paint_handler_settings;
     superscene_push_scene(scene);
 
+    if (!version_init_firmware())
+        scene_switch_to_message(state, L"Failed to get firmware version");
+
+    if (!version_init_bootloader())
+        scene_switch_to_message(state, L"Failed to get bootloader version");
+
     array_list_item_init(list.items);
 
     list_item_t item;
     list_item_init(&item);
 
     item.left_text = wstring_new_static(L"Menu version");
-    item.right_text = wstring_new_copied_cstr(GIT_REV);
+    item.right_text = wstring_new_copied_cstr(version_get_menu());
     item_idx_menu_version = list_push_item(&list, item);
 
-    char fw_git_rev[9] = "N/A";
-    char bootloader_git_rev[9] = "N/A";
-
-    if (!modchip_fw_git_rev(fw_git_rev))
-        scene_switch_to_message(state, L"Failed to get firmware version");
-
-    if (!modchip_bootloader_git_rev(bootloader_git_rev))
-        scene_switch_to_message(state, L"Failed to get bootloader version");
-
     item.left_text = wstring_new_static(L"Modchip FW version");
-    item.right_text = wstring_new_copied_cstr(fw_git_rev);
+    item.right_text = wstring_new_copied_cstr(version_get_firmware());
     item_idx_modchip_fw_version = list_push_item(&list, item);
 
     item.left_text = wstring_new_static(L"Modchip bootloader version");
-    item.right_text = wstring_new_copied_cstr(bootloader_git_rev);
+    item.right_text = wstring_new_copied_cstr(version_get_bootloader());
     item_idx_modchip_bootloader_version = list_push_item(&list, item);
 
     item.left_text = wstring_new_static(L"Update firmware");

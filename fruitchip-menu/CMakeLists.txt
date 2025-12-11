@@ -43,6 +43,7 @@ add_executable(fruitchip-menu
     src/pin_config.c
     src/update.c
     src/utils.c
+    src/version.c
 )
 
 target_compile_definitions(fruitchip-menu
