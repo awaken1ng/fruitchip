@@ -16,6 +16,7 @@ add_executable(fruitchip-menu
     src/components/button_guide.c
     src/components/font.c
     src/components/list.c
+    src/components/progress_bar.c
 
     src/input/pad.c
 
