@@ -7,6 +7,26 @@
 #include <stddef.h>
 #include <stdio.h>
 
+inline static uint32_t *binary_info_find_marker(void *program)
+{
+    static const uintptr_t BOOT2_SIZE = 256;
+
+    for (uintptr_t offset = 0; offset < BOOT2_SIZE; offset += 4)
+    {
+        uint32_t *marker_start = (void *)(program + BOOT2_SIZE + offset);
+        if (*marker_start != BINARY_INFO_MARKER_START)
+            continue;
+
+        uint32_t *marker_end = (void *)(program + BOOT2_SIZE + offset + 16);
+        if (*marker_end != BINARY_INFO_MARKER_END)
+            continue;
+
+        return marker_start;
+    }
+
+    return NULL;
+}
+
 inline static void *binary_info_map_address(uint32_t *mapping_table, void *addr)
 {
     int i = 0;
@@ -30,37 +50,18 @@ next:
         i += 3;
     }
 
-    return NULL;
+    return addr;
 }
 
 inline static const char *binary_info_version(void *program)
 {
-    uint32_t *entries_start = NULL;
-    uint32_t *entries_end = NULL;
-    uint32_t *mapping_table = NULL;
-
-    // look for BINARY_INFO_MARKER_START in 256 bytes after boot2
-    for (int offset = 0; offset < 0x100; offset += 4)
-    {
-        uint32_t *marker_start = (void *)(program + 0x100 + offset);
-        if (*marker_start != BINARY_INFO_MARKER_START)
-            continue;
-
-        uint32_t *marker_end = (void *)(program + 0x100 + offset + 16);
-        if (*marker_end != BINARY_INFO_MARKER_END)
-            return NULL;
-
-        entries_start = (void *) *(uint32_t *)(program + 0x100 + offset + 4);
-        entries_end   = (void *) *(uint32_t *)(program + 0x100 + offset + 8);
-        mapping_table = (void *) *(uint32_t *)(program + 0x100 + offset + 12);
-
-        break;
-    }
-
-    if (!entries_start || !entries_end || !mapping_table)
-    {
+    uint32_t *marker_start = binary_info_find_marker(program);
+    if (!marker_start)
         return NULL;
-    }
+
+    uint32_t *entries_start = (uint32_t *) *(marker_start + 1);
+    uint32_t *entries_end   = (uint32_t *) *(marker_start + 2);
+    uint32_t *mapping_table = (uint32_t *) *(marker_start + 3);
 
     uint32_t entries_size = (void *)entries_end - (void *)entries_start;
     uint32_t entries_count = entries_size / sizeof(uint32_t);

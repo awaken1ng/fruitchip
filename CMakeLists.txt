@@ -84,6 +84,7 @@ if(BUILD_PS2)
         fruitchip-menu
         SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-menu"
         CMAKE_ARGS
+            -DBOARD=${BOARD}
             -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
             -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
             -DCMAKE_INSTALL_PREFIX=${MENU_INSTALL_PREFIX}

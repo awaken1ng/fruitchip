@@ -4,6 +4,7 @@
 
 #include "modchip/version.h"
 
+#include <scene/settings/update.h>
 #include "scene/message.h"
 #include "scene/settings.h"
 #include "git_version.h"
@@ -40,11 +41,13 @@ static void scene_input_handler_settings(struct state *state, int input)
     {
         if (list.hilite_idx == item_idx_update_firmware)
         {
-            scene_switch_to_settings_about_update_fw(state);
+            scene_switch_to_update_scanning(state, UPDATE_TYPE_FW);
+            state->repaint = true;
         }
         else if (list.hilite_idx == item_idx_update_apps)
         {
-            scene_switch_to_settings_about_update_apps(state);
+            scene_switch_to_update_scanning(state, UPDATE_TYPE_APPS);
+            state->repaint = true;
         }
     }
 }
@@ -106,6 +109,4 @@ void scene_switch_to_settings_about(struct state *state)
     item.left_text = wstring_new_static(L"Update apps");
     item.right_text = wstring_new_static(L">");
     item_idx_update_apps = list_push_item(&list, item);
-
-    state->repaint = true;
 }

@@ -221,6 +221,7 @@ void scene_input_handler_boot_list(struct state *state, int input)
     else if (input & PAD_START)
     {
         scene_switch_to_settings(state);
+        state->repaint = true;
     }
 }
 

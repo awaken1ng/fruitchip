@@ -179,6 +179,7 @@ static void scene_input_handler_settings(struct state *state, int input)
                     break;
                 case ITEM_IDX_ABOUT:
                     scene_switch_to_settings_about(state);
+                    state->repaint = true;
                     break;
             }
         }
@@ -218,6 +219,4 @@ void scene_switch_to_settings(struct state *state)
     scene.input_handler = scene_input_handler_settings;
     scene.paint_handler = scene_paint_handler_settings;
     superscene_push_scene(scene);
-
-    state->repaint = true;
 }

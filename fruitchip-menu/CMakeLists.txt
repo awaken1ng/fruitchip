@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 include(FetchContent)
+include(../fruitchip-fw-board/board_configuration.cmake)
 
 project(fruitchip-menu)
 
@@ -20,12 +21,17 @@ add_executable(fruitchip-menu
 
     src/input/pad.c
 
+    src/scene/settings/update/checking.c
+    src/scene/settings/update/complete.c
+    src/scene/settings/update/found.c
+    src/scene/settings/update/not_found.c
+    src/scene/settings/update/rebooting.c
+    src/scene/settings/update/scanning.c
+    src/scene/settings/update/writing.c
     src/scene/boot_list.c
     src/scene/boot_options.c
     src/scene/init.c
     src/scene/message.c
-    src/scene/settings_about_update_apps.c
-    src/scene/settings_about_update_fw.c
     src/scene/settings_about.c
     src/scene/settings.c
     src/scene/superscene.c
@@ -34,8 +40,14 @@ add_executable(fruitchip-menu
     ${CMAKE_CURRENT_BINARY_DIR}/src/embedded_irx.c
     src/init.c
     src/main.c
+    src/pin_config.c
     src/update.c
     src/utils.c
+)
+
+target_compile_definitions(fruitchip-menu
+    PUBLIC
+        FW_PARTITION_OFFSET=${FW_PARTITION_OFFSET}
 )
 
 target_include_directories(fruitchip-menu
@@ -45,6 +57,8 @@ target_include_directories(fruitchip-menu
         ${CMAKE_CURRENT_SOURCE_DIR}/../fruitchip-include
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/masswatch/ee/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../pico-sdk/src/common/pico_base_headers/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../pico-sdk/src/common/pico_binary_info/include
 )
 
 target_link_libraries(fruitchip-menu
