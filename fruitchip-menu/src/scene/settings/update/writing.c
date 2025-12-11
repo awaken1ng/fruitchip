@@ -99,6 +99,7 @@ static void scene_tick_handler_update_writing(struct state *state)
 
     superscene_pop_scene();
     scene_switch_to_update_rebooting();
+    state->repaint = true;
 
 exit:
     if (!modchip_set_write_lock_with_retry(true, MODCHIP_CMD_RETRIES))
