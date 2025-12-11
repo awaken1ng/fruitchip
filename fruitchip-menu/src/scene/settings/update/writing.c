@@ -86,6 +86,8 @@ static void scene_tick_handler_update_writing(struct state *state)
             pop_scene_and_show_message(state, L"Failed to write flash sector");
             goto exit;
         }
+
+        superscene_paint_after_vsync(state);
     }
 
     // first sector
