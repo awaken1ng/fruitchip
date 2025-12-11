@@ -1,6 +1,6 @@
 #pragma once
 
-#include "state.h"
+#include <stdbool.h>
 
 #define FW_UPDATE_PATH "fruitchip/update/fw.uf2"
 #define APPS_UPDATE_PATH "fruitchip/update/apps.uf2"

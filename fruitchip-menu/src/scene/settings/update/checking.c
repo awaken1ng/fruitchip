@@ -13,7 +13,6 @@
 #include <pin_config.h>
 #include <constants.h>
 
-static enum update_type update_type;
 static u32 offset;
 static u32 size;
 
@@ -28,7 +27,7 @@ static void scene_tick_handler_update_checking(struct state *state)
     state->repaint = true;
     scene_paint_handler_superscene(state);
 
-    int fd = update_file_open(update_type);
+    int fd = update_file_open(state->update_type);
     if (fd < 0)
     {
         pop_scene_and_show_message(state, L"Failed to open update file");
@@ -118,15 +117,15 @@ static void scene_tick_handler_update_checking(struct state *state)
     }
 
     if (
-        (update_type == UPDATE_TYPE_FW && (update_size > fw_partition_size || update_size > update_partition_size)) ||
-        (update_type == UPDATE_TYPE_APPS && (update_size > apps_partition_size))
+        (state->update_type == UPDATE_TYPE_FW && (update_size > fw_partition_size || update_size > update_partition_size)) ||
+        (state->update_type == UPDATE_TYPE_APPS && (update_size > apps_partition_size))
     )
     {
         pop_scene_and_show_message(state, L"Not enough space to write the update");
         goto exit;
     }
 
-    if (update_type == UPDATE_TYPE_FW)
+    if (state->update_type == UPDATE_TYPE_FW)
     {
         u32 pin_mask_data_current = 0;
         u32 pin_mask_ce_current = 0;
@@ -183,7 +182,7 @@ static void scene_tick_handler_update_checking(struct state *state)
     }
 
     superscene_pop_scene();
-    scene_switch_to_update_writing(update_type, update, update_size);
+    scene_switch_to_update_writing(update, update_size);
     state->repaint = true;
 
 exit:
@@ -198,7 +197,7 @@ static void scene_paint_handler_update_checking(struct state *state)
     superscene_clear_button_guide(state);
 }
 
-void scene_switch_to_update_checking(enum update_type ty)
+void scene_switch_to_update_checking()
 {
     scene_t scene;
     scene_init(&scene);
@@ -206,7 +205,6 @@ void scene_switch_to_update_checking(enum update_type ty)
     scene.paint_handler = scene_paint_handler_update_checking;
     superscene_push_scene(scene);
 
-    update_type = ty;
     offset = 0;
     size = 0;
 }

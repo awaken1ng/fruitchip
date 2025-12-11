@@ -10,6 +10,7 @@
 #include "input/pad.h"
 #include "components/list.h"
 #include "components/button_guide.h"
+#include "update.h"
 
 ARRAY_DEF(array_u32, u32)
 
@@ -48,9 +49,5 @@ struct state {
 
     union osdsys_settings osdsys;
 
-    bool update_file_present;
-    bool update_in_progress;
-    bool update_complete;
-    u32 update_blocks_total;
-    u32 update_block_current;
+    enum update_type update_type;
 };

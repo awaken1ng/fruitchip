@@ -5,7 +5,6 @@
 #include <scene/superscene.h>
 #include <constants.h>
 
-static enum update_type update_type;
 static list_state_t list;
 static u32 item_idx_no;
 static u32 item_idx_yes;
@@ -36,7 +35,7 @@ static void scene_input_handler_file_found(struct state *state, int input)
         else if (list.hilite_idx == item_idx_yes)
         {
             pop_scene(state);
-            scene_switch_to_update_checking(update_type);
+            scene_switch_to_update_checking();
         }
     }
 }
@@ -60,15 +59,13 @@ static void scene_paint_handler_file_found(struct state *state)
     state->button_guide.circle = L"Return";
 }
 
-void scene_switch_to_update_found(enum update_type ty)
+void scene_switch_to_update_found()
 {
     scene_t scene;
     scene_init(&scene);
     scene.input_handler = scene_input_handler_file_found;
     scene.paint_handler = scene_paint_handler_file_found;
     superscene_push_scene(scene);
-
-    update_type = ty;
 
     array_list_item_init(list.items);
     list.hilite_idx = 0;

@@ -8,17 +8,15 @@
 #include <update.h>
 #include <utils.h>
 
-static enum update_type update_type;
-
 static void scene_tick_handler_update_scanning(struct state *state)
 {
     scene_paint_handler_superscene(state);
     superscene_pop_scene();
 
     u64 start_us = clock_us();
-    update_file_is_present(update_type)
-        ? scene_switch_to_update_found(update_type)
-        : scene_switch_to_update_not_found(update_type);
+    update_file_is_present(state->update_type)
+        ? scene_switch_to_update_found()
+        : scene_switch_to_update_not_found();
     u64 end_us = clock_us();
 
     u64 took_us = end_us - start_us;
@@ -45,7 +43,7 @@ static void scene_paint_handler_update_scanning(struct state *state)
     superscene_clear_button_guide(state);
 }
 
-void scene_switch_to_update_scanning(struct state *state, enum update_type ty)
+void scene_switch_to_update_scanning(struct state *state)
 {
     scene_t scene;
     scene_init(&scene);
@@ -53,9 +51,7 @@ void scene_switch_to_update_scanning(struct state *state, enum update_type ty)
     scene.paint_handler = scene_paint_handler_update_scanning;
     superscene_push_scene(scene);
 
-    update_type = ty;
-
-    switch (update_type)
+    switch (state->update_type)
     {
         case UPDATE_TYPE_FW:
         {

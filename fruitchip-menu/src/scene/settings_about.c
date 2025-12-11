@@ -41,12 +41,14 @@ static void scene_input_handler_settings(struct state *state, int input)
     {
         if (list.hilite_idx == item_idx_update_firmware)
         {
-            scene_switch_to_update_scanning(state, UPDATE_TYPE_FW);
+            state->update_type = UPDATE_TYPE_FW;
+            scene_switch_to_update_scanning(state);
             state->repaint = true;
         }
         else if (list.hilite_idx == item_idx_update_apps)
         {
-            scene_switch_to_update_scanning(state, UPDATE_TYPE_APPS);
+            state->update_type = UPDATE_TYPE_APPS;
+            scene_switch_to_update_scanning(state);
             state->repaint = true;
         }
     }

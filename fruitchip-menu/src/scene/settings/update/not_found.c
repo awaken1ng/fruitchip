@@ -5,8 +5,6 @@
 #include <scene/superscene.h>
 #include <constants.h>
 
-static enum update_type update_type;
-
 static void scene_input_handler_update_not_found(struct state *state, int input)
 {
     if (input & PAD_CIRCLE)
@@ -17,7 +15,7 @@ static void scene_input_handler_update_not_found(struct state *state, int input)
     else if (input & PAD_CROSS)
     {
         superscene_pop_scene();
-        scene_switch_to_update_scanning(state, update_type);
+        scene_switch_to_update_scanning(state);
         state->repaint = true;
     }
 }
@@ -29,7 +27,7 @@ static void scene_paint_handler_update_not_found(struct state *state)
     wchar_t *line1_part2;
     float line1_part1_w = font_text_width(line1_part1);
 
-    switch (update_type)
+    switch (state->update_type)
     {
         case UPDATE_TYPE_FW:
             line1_part2 = L"" FW_UPDATE_PATH; break;
@@ -53,13 +51,11 @@ static void scene_paint_handler_update_not_found(struct state *state)
     state->button_guide.circle = L"Return";
 }
 
-void scene_switch_to_update_not_found(enum update_type ty)
+void scene_switch_to_update_not_found()
 {
     scene_t scene;
     scene_init(&scene);
     scene.input_handler = scene_input_handler_update_not_found;
     scene.paint_handler = scene_paint_handler_update_not_found;
     superscene_push_scene(scene);
-
-    update_type = ty;
 }

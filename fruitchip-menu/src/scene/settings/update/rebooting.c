@@ -9,8 +9,6 @@
 #include <constants.h>
 #include <utils.h>
 
-static enum update_type update_type;
-
 static void scene_tick_handler_update_rebooting(struct state *state)
 {
     scene_paint_handler_superscene(state);
@@ -19,7 +17,7 @@ static void scene_tick_handler_update_rebooting(struct state *state)
     state->repaint = true;
 
     enum modchip_reboot_mode reboot_mode;
-    switch (update_type)
+    switch (state->update_type)
     {
         case UPDATE_TYPE_FW:
             reboot_mode = MODCHIP_REBOOT_MODE_UPDATE;
@@ -64,13 +62,11 @@ static void scene_paint_handler_update_rebooting(struct state *state)
     superscene_clear_button_guide(state);
 }
 
-void scene_switch_to_update_rebooting(enum update_type ty)
+void scene_switch_to_update_rebooting()
 {
     scene_t scene;
     scene_init(&scene);
     scene.tick_handler = scene_tick_handler_update_rebooting;
     scene.paint_handler = scene_paint_handler_update_rebooting;
     superscene_push_scene(scene);
-
-    update_type = ty;
 }

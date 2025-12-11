@@ -10,7 +10,6 @@
 
 #define FLASH_ERASE_BYTE 0xFF
 
-static enum update_type update_type;
 static u8 *update;
 static u32 current_offset;
 static u32 size;
@@ -50,7 +49,7 @@ static void scene_tick_handler_update_writing(struct state *state)
 {
     enum modchip_partition partition_idx;
 
-    switch (update_type)
+    switch (state->update_type)
     {
         case UPDATE_TYPE_FW:
             partition_idx = MODCHIP_PARTITION_IDX_FW_UPDATE;
@@ -97,7 +96,7 @@ static void scene_tick_handler_update_writing(struct state *state)
     }
 
     superscene_pop_scene();
-    scene_switch_to_update_rebooting(update_type);
+    scene_switch_to_update_rebooting();
 
 exit:
     if (!modchip_set_write_lock_with_retry(true, MODCHIP_CMD_RETRIES))
@@ -114,7 +113,7 @@ static void scene_paint_handler_update_writing(struct state *state)
     superscene_clear_button_guide(state);
 }
 
-void scene_switch_to_update_writing(enum update_type ty, u8 *_update, u32 _update_size)
+void scene_switch_to_update_writing(u8 *_update, u32 _update_size)
 {
     scene_t scene;
     scene_init(&scene);
@@ -122,7 +121,6 @@ void scene_switch_to_update_writing(enum update_type ty, u8 *_update, u32 _updat
     scene.paint_handler = scene_paint_handler_update_writing;
     superscene_push_scene(scene);
 
-    update_type = ty;
     update = _update;
     current_offset = 0;
     size = _update_size;
