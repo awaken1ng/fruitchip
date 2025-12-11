@@ -68,7 +68,6 @@ static void scene_paint_handler_message(struct state *state)
     font_print_centered(state->gs, msg_state->y, 1.0, FG, msg_state->text);
     superscene_clear_button_guide(state);
     state->button_guide.circle = L"Return";
-    state->repaint = true;
 }
 
 void scene_switch_to_message(struct state *state, wchar_t *text)
