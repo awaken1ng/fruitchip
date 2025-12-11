@@ -6,6 +6,8 @@
 #include <hardware/watchdog.h>
 #include <hardware/flash.h>
 #include <hardware/sync.h>
+#include <hardware/clocks.h>
+#include <hardware/pll.h>
 
 #include "colored_status_led.h"
 
@@ -204,6 +206,19 @@ void __time_critical_func(try_update_firmware)()
 
 int __time_critical_func(main)()
 {
+    const uint32_t hz = 240;
+
+    // inline `set_sys_clock_khz(hz * KHZ, true)`, saves ~180 us
+    static_assert(hz == 240);
+    static_assert(XOSC_HZ == 12000000);
+    static_assert(PLL_COMMON_REFDIV == 1);
+    static_assert(PICO_PLL_VCO_MIN_FREQ_HZ == 750 * MHZ);
+    static_assert(PICO_PLL_VCO_MAX_FREQ_HZ == 1600 * MHZ);
+    uint vco = 1440000000, postdiv1 = 6, postdiv2 = 1;
+    set_sys_clock_pll(vco, postdiv1, postdiv2);
+
+    clock_configure(clk_peri, 0, CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS, hz * MHZ, hz * MHZ);
+
     stdio_init_all();
 
     printf("fruitchip bootloader\n");
