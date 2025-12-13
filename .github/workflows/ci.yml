@@ -29,7 +29,7 @@ jobs:
 
       - run: |
           export WINEPREFIX=${{ github.workspace }}/build/wine
-          mkdir $WINEPREFIX
+          mkdir --parents $WINEPREFIX
           cmake -B build build -DBUILD_PS2=1 -DBUILD_ARM=0 -DBOARD=waveshare-rp2040-tiny
           cmake --build build
 
