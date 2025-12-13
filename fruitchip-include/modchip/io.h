@@ -7,7 +7,12 @@
 #include "sleep.h"
 #include "errno.h"
 
+#ifdef _EE
 #define BOOT_ROM_ADDR (0x1FC00000 + 0x000000C0)
+#else
+#define BOOT_ROM_ADDR (0xBFC00000 + 0x000000C0)
+#endif
+
 #define BOOT_ROM_ADDR_VALUE 0x00000000 // value BOOT_ROM_ADDR points to
 
 #define MODCHIP_CMD_RETRIES 3
