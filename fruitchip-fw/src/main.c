@@ -69,11 +69,11 @@ int __time_critical_func(main)()
 
     while (true)
     {
-        if (!pio_sm_is_rx_fifo_empty(pio0, BOOT_ROM_READ_SNIFFER_SM))
-            read_handler(pio_sm_get(pio0, BOOT_ROM_READ_SNIFFER_SM));
+        if (!pio_sm_is_rx_fifo_empty(BOOT_ROM_PIO, BOOT_ROM_READ_SNIFFER_SM))
+            read_handler(pio_sm_get(BOOT_ROM_PIO, BOOT_ROM_READ_SNIFFER_SM));
 
-        if (!pio_sm_is_rx_fifo_empty(pio0, BOOT_ROM_WRITE_SNIFFER_SM))
-            write_handler(pio_sm_get(pio0, BOOT_ROM_WRITE_SNIFFER_SM));
+        if (!pio_sm_is_rx_fifo_empty(BOOT_ROM_PIO, BOOT_ROM_WRITE_SNIFFER_SM))
+            write_handler(pio_sm_get(BOOT_ROM_PIO, BOOT_ROM_WRITE_SNIFFER_SM));
     }
 
     return 0;

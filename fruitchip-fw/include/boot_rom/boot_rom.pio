@@ -109,6 +109,8 @@ ce_high2:
 // 12 instructions, 23 total, 9 remaining
 
 % c-sdk {
+#define BOOT_ROM_PIO pio0
+
 static const uint8_t boot_rom_read_sniffer_program_instructions_count = sizeof(boot_rom_read_sniffer_program_instructions) / sizeof(*boot_rom_read_sniffer_program_instructions);
 static const uint8_t boot_rom_write_sniffer_program_instructions_count = sizeof(boot_rom_write_sniffer_program_instructions) / sizeof(*boot_rom_write_sniffer_program_instructions);
 static const uint8_t boot_rom_data_out_program_instructions_count = sizeof(boot_rom_data_out_program_instructions) / sizeof(*boot_rom_data_out_program_instructions);

@@ -30,7 +30,7 @@ const uint32_t DMA_CTRL_32 = (
 
 const uint32_t DMA_CTRL_DATA_OUT = (
     dma_ctrl_reg_field(IRQ_QUIET, true) |
-    dma_ctrl_reg_field(TREQ_SEL, PIO_DREQ_NUM(pio0, BOOT_ROM_DATA_OUT_SM, true)) |
+    dma_ctrl_reg_field(TREQ_SEL, PIO_DREQ_NUM(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM, true)) |
     dma_ctrl_reg_field(INCR_READ, true) |
     dma_ctrl_reg_field(DATA_SIZE, DMA_SIZE_8) |
     dma_ctrl_reg_field(HIGH_PRIORITY, true) |
@@ -66,7 +66,7 @@ static __not_in_flash("dma_sniff_setup") struct {
         dma_ctrl_reg_field(CHAIN_TO, channel)       \
     ),                                              \
     .read_addr = &data_out_status_code,             \
-    .write_addr = &pio0->txf[BOOT_ROM_DATA_OUT_SM], \
+    .write_addr = &BOOT_ROM_PIO->txf[BOOT_ROM_DATA_OUT_SM], \
     .trans_count = sizeof(data_out_status_code),    \
 }
 
@@ -76,7 +76,7 @@ const control_block_t CONTROL_BLOCK_CRC = {
         dma_ctrl_reg_field(CHAIN_TO, BOOT_ROM_DATA_OUT_CTRL1_CHAN)
     ),
     .read_addr = &dma_hw->sniff_data,
-    .write_addr = &pio0->txf[BOOT_ROM_DATA_OUT_SM],
+    .write_addr = &BOOT_ROM_PIO->txf[BOOT_ROM_DATA_OUT_SM],
     .trans_count = sizeof(dma_hw->sniff_data)
 };
 
@@ -90,7 +90,7 @@ const control_block_t CONTROL_BLOCK_EOT = {
         dma_ctrl_reg_field(CHAIN_TO, BOOT_ROM_DATA_OUT_CTRL1_CHAN)
     ),
     .read_addr = &ZERO,
-    .write_addr = &pio0->txf[BOOT_ROM_DATA_OUT_SM],
+    .write_addr = &BOOT_ROM_PIO->txf[BOOT_ROM_DATA_OUT_SM],
     .trans_count = sizeof(ZERO)
 };
 
@@ -150,7 +150,7 @@ static control_block_t __not_in_flash("control_blocks.data_out") CONTROL_BLOCKS_
             dma_ctrl_reg_field(CHAIN_TO, BOOT_ROM_DATA_OUT_CTRL1_CHAN)
         ),
         .read_addr = NULL, // set by start function
-        .write_addr = &pio0->txf[BOOT_ROM_DATA_OUT_SM],
+        .write_addr = &BOOT_ROM_PIO->txf[BOOT_ROM_DATA_OUT_SM],
         .trans_count = 0, // set by start function
     },
     CONTROL_BLOCK_NULL,
@@ -160,7 +160,7 @@ static control_block_t __not_in_flash("control_blocks.data_out") CONTROL_BLOCKS_
 
 void __isr __time_critical_func(byte_out_irq_handler)()
 {
-    if (!pio_sm_is_tx_fifo_empty(pio0, BOOT_ROM_DATA_OUT_SM))
+    if (!pio_sm_is_tx_fifo_empty(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM))
         goto exit;
 
     boot_rom_data_out_stop();
@@ -168,7 +168,7 @@ void __isr __time_critical_func(byte_out_irq_handler)()
     boot_rom_data_out_reset();
 
 exit:
-    pio_interrupt_clear(pio0, BOOT_ROM_BYTE_OUT_IRQ);
+    pio_interrupt_clear(BOOT_ROM_PIO, BOOT_ROM_BYTE_OUT_IRQ);
 }
 
 void __time_critical_func(boot_rom_data_out_init)()
@@ -194,29 +194,29 @@ void __time_critical_func(boot_rom_data_out_init)()
     gpio_set_drive_strength(BOOT_ROM_Q0_PIN + 7, GPIO_DRIVE_STRENGTH_12MA);
 
     // assign hardcoded SM indices to avoid runtime calculations of masks
-    pio_sm_claim(pio0, BOOT_ROM_READ_SNIFFER_SM);
-    pio_sm_claim(pio0, BOOT_ROM_WRITE_SNIFFER_SM);
-    pio_sm_claim(pio0, BOOT_ROM_DATA_OUT_SM);
+    pio_sm_claim(BOOT_ROM_PIO, BOOT_ROM_READ_SNIFFER_SM);
+    pio_sm_claim(BOOT_ROM_PIO, BOOT_ROM_WRITE_SNIFFER_SM);
+    pio_sm_claim(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM);
 
     // load programs in specific order to match the statically calculated offsets
 #ifdef PICO_DEFAULT_LED_PIN
-    int offset = pio_add_program(pio0, &boot_rom_read_sniffer_with_led_program);
+    int offset = pio_add_program(BOOT_ROM_PIO, &boot_rom_read_sniffer_with_led_program);
 #else
-    int offset = pio_add_program(pio0, &boot_rom_read_sniffer_program);
+    int offset = pio_add_program(BOOT_ROM_PIO, &boot_rom_read_sniffer_program);
 #endif
-    boot_rom_read_sniffer_sm_init_and_start(pio0, BOOT_ROM_READ_SNIFFER_SM, boot_rom_read_sniffer_offset);
+    boot_rom_read_sniffer_sm_init_and_start(BOOT_ROM_PIO, BOOT_ROM_READ_SNIFFER_SM, boot_rom_read_sniffer_offset);
     if (boot_rom_read_sniffer_offset != offset) panic("Read sniffer loaded at unexpected offset");
 
-    offset = pio_add_program(pio0, &boot_rom_write_sniffer_program);
-    boot_rom_write_sniffer_sm_init_and_start(pio0, BOOT_ROM_WRITE_SNIFFER_SM, boot_rom_write_sniffer_offset);
+    offset = pio_add_program(BOOT_ROM_PIO, &boot_rom_write_sniffer_program);
+    boot_rom_write_sniffer_sm_init_and_start(BOOT_ROM_PIO, BOOT_ROM_WRITE_SNIFFER_SM, boot_rom_write_sniffer_offset);
     if (boot_rom_write_sniffer_offset != offset) panic("Write sniffer loaded at unexpected offset");
 
 #ifdef PICO_DEFAULT_LED_PIN
-    offset = pio_add_program(pio0, &boot_rom_data_out_with_led_program);
+    offset = pio_add_program(BOOT_ROM_PIO, &boot_rom_data_out_with_led_program);
 #else
-    offset = pio_add_program(pio0, &boot_rom_data_out_program);
+    offset = pio_add_program(BOOT_ROM_PIO, &boot_rom_data_out_program);
 #endif
-    boot_rom_data_out_sm_init(pio0, BOOT_ROM_DATA_OUT_SM, boot_rom_data_out_offset);
+    boot_rom_data_out_sm_init(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM, boot_rom_data_out_offset);
     if (boot_rom_data_out_offset != offset) panic("Data out loaded at unexpected offset");
 }
 
@@ -248,9 +248,9 @@ void __time_critical_func(boot_rom_data_out_init_dma)()
     channel_config_set_transfer_data_size(&dma_tx_busy_ping_conf, DMA_SIZE_8);
     channel_config_set_read_increment(&dma_tx_busy_ping_conf, true);
     channel_config_set_write_increment(&dma_tx_busy_ping_conf, false);
-    channel_config_set_dreq(&dma_tx_busy_ping_conf, pio_get_dreq(pio0, BOOT_ROM_DATA_OUT_SM, true));
+    channel_config_set_dreq(&dma_tx_busy_ping_conf, pio_get_dreq(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM, true));
     dma_channel_set_read_addr(BOOT_ROM_DATA_OUT_BUSY_PING, &data_out_busy_code, false);
-    dma_channel_set_write_addr(BOOT_ROM_DATA_OUT_BUSY_PING, &pio0->txf[BOOT_ROM_DATA_OUT_SM], false);
+    dma_channel_set_write_addr(BOOT_ROM_DATA_OUT_BUSY_PING, &BOOT_ROM_PIO->txf[BOOT_ROM_DATA_OUT_SM], false);
     dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_BUSY_PING, sizeof(data_out_busy_code), false);
     dma_channel_set_config(BOOT_ROM_DATA_OUT_BUSY_PING, &dma_tx_busy_ping_conf, false);
 
@@ -268,7 +268,7 @@ void __time_critical_func(boot_rom_data_out_init_dma)()
     dma_channel_set_transfer_count(BOOT_ROM_DATA_OUT_BUSY_PONG, 1, false);
     dma_channel_set_config(BOOT_ROM_DATA_OUT_BUSY_PONG, &dma_tx_busy_pong_conf, false);
 
-    pio_set_irq0_source_enabled(pio0, pis_interrupt0 + BOOT_ROM_BYTE_OUT_IRQ, true);
+    pio_set_irq0_source_enabled(BOOT_ROM_PIO, pis_interrupt0 + BOOT_ROM_BYTE_OUT_IRQ, true);
     irq_set_exclusive_handler(PIO0_IRQ_0, byte_out_irq_handler);
     irq_set_enabled(PIO0_IRQ_0, true);
 }

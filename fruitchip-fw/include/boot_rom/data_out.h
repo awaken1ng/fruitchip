@@ -33,35 +33,35 @@ void boot_rom_data_out_init_dma();
 
 inline static void boot_rom_data_out_start()
 {
-    pio_set_sm_mask_enabled(pio0, (1 << BOOT_ROM_DATA_OUT_SM), true);
+    pio_set_sm_mask_enabled(BOOT_ROM_PIO, (1 << BOOT_ROM_DATA_OUT_SM), true);
 }
 
 inline static void boot_rom_data_out_stop()
 {
-    pio_set_sm_mask_enabled(pio0, (1 << BOOT_ROM_DATA_OUT_SM), false);
+    pio_set_sm_mask_enabled(BOOT_ROM_PIO, (1 << BOOT_ROM_DATA_OUT_SM), false);
 }
 
 inline static void boot_rom_data_out_reset()
 {
-    pio_restart_sm_mask(pio0, (1 << BOOT_ROM_DATA_OUT_SM));
-    pio_sm_exec(pio0, BOOT_ROM_DATA_OUT_SM, pio_encode_jmp(boot_rom_data_out_offset));
+    pio_restart_sm_mask(BOOT_ROM_PIO, (1 << BOOT_ROM_DATA_OUT_SM));
+    pio_sm_exec(BOOT_ROM_PIO, BOOT_ROM_DATA_OUT_SM, pio_encode_jmp(boot_rom_data_out_offset));
 }
 
 inline static void boot_rom_sniffers_start()
 {
-    pio_set_sm_mask_enabled(pio0, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM), true);
+    pio_set_sm_mask_enabled(BOOT_ROM_PIO, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM), true);
 }
 
 inline static void boot_rom_sniffers_stop()
 {
-    pio_set_sm_mask_enabled(pio0, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM), false);
+    pio_set_sm_mask_enabled(BOOT_ROM_PIO, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM), false);
 }
 
 inline static void boot_rom_sniffers_reset()
 {
-    pio_restart_sm_mask(pio0, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM));
-    pio_sm_exec(pio0, BOOT_ROM_READ_SNIFFER_SM, pio_encode_jmp(boot_rom_read_sniffer_offset));
-    pio_sm_exec(pio0, BOOT_ROM_WRITE_SNIFFER_SM, pio_encode_jmp(boot_rom_write_sniffer_offset));
+    pio_restart_sm_mask(BOOT_ROM_PIO, (1 << BOOT_ROM_READ_SNIFFER_SM) | (1 << BOOT_ROM_WRITE_SNIFFER_SM));
+    pio_sm_exec(BOOT_ROM_PIO, BOOT_ROM_READ_SNIFFER_SM, pio_encode_jmp(boot_rom_read_sniffer_offset));
+    pio_sm_exec(BOOT_ROM_PIO, BOOT_ROM_WRITE_SNIFFER_SM, pio_encode_jmp(boot_rom_write_sniffer_offset));
 }
 
 void boot_rom_data_out_set_data(const volatile void *read_addr, uint32_t encoded_transfer_count);
