@@ -126,6 +126,7 @@ if(BUILD_ARM)
 
     if(BUILD_PS2)
         ExternalProject_Add_StepDependencies(fruitchip-fw build fruitchip-loader)
+        ExternalProject_Add_StepDependencies(fruitchip-fw build fruitchip-menu)
     endif()
 
     ExternalProject_Add(
