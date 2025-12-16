@@ -36,7 +36,7 @@ see `fruitchip-fw-board/custom.cmake.example` for example board configuration.
 ```sh
 export PATH=/opt/ATfE-20.1.0-Linux-x86_64/bin:$PATH
 cmake -B build -DBOARD=waveshare-rp2040-tiny
-cmake --build build
+cmake --build build -j$(nproc)
 ```
 
 # Installation

@@ -31,7 +31,7 @@ jobs:
           export WINEPREFIX=${{ github.workspace }}/build/wine
           mkdir --parents $WINEPREFIX
           cmake -B build build -DBUILD_PS2=1 -DBUILD_ARM=0 -DBOARD=waveshare-rp2040-tiny
-          cmake --build build
+          cmake --build build -j$(nproc)
 
       - uses: actions/upload-artifact@v5
         with:
@@ -69,7 +69,7 @@ jobs:
 
       - run: |
           export PATH=/opt/ATfE-20.1.0-Linux-x86_64/bin:$PATH
-          cmake --build build
+          cmake --build build -j$(nproc)
 
       - uses: actions/upload-artifact@v4
         with:
