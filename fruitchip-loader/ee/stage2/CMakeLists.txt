@@ -1,36 +1,27 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(fruitchip-loader-ee-stage1)
-
-if(NOT DEFINED EE_STAGE_1_ADDR)
-    message(FATAL_ERROR "EE_STAGE_1_ADDR is not set")
-endif()
+project(fruitchip-loader-ee-stage2)
 
 if(NOT DEFINED EE_STAGE_2_ADDR)
     message(FATAL_ERROR "EE_STAGE_2_ADDR is not set")
 endif()
 
-add_executable(fruitchip-loader-ee-stage1
+add_executable(fruitchip-loader-ee-stage2
     src/main.c
 )
 
-target_include_directories(fruitchip-loader-ee-stage1
+target_include_directories(fruitchip-loader-ee-stage2
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../fruitchip-include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../fruitchip-include
 )
 
-target_compile_definitions(fruitchip-loader-ee-stage1
-    PUBLIC
-        EE_STAGE_1_ADDR=${EE_STAGE_1_ADDR}
-        EE_STAGE_2_ADDR=${EE_STAGE_2_ADDR}
-)
-
-target_compile_options(fruitchip-loader-ee-stage1
+target_compile_options(fruitchip-loader-ee-stage2
     PUBLIC
         -Os
 )
 
-target_link_options(fruitchip-loader-ee-stage1
+target_link_options(fruitchip-loader-ee-stage2
     PUBLIC
         -nostartfiles
         -Wl,--gc-sections
@@ -44,7 +35,7 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/linkfile
 )
 
-set_target_properties(fruitchip-loader-ee-stage1
+set_target_properties(fruitchip-loader-ee-stage2
     PROPERTIES
         LINK_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/linkfile
 )
@@ -54,7 +45,7 @@ separate_arguments(LINKER_FLAGS UNIX_COMMAND ${CMAKE_EXE_LINKER_FLAGS})
 list(REMOVE_ITEM LINKER_FLAGS "-T$ENV{PS2SDK}/ee/startup/linkfile")
 list(JOIN LINKER_FLAGS " " CMAKE_EXE_LINKER_FLAGS)
 
-target_link_options(fruitchip-loader-ee-stage1
+target_link_options(fruitchip-loader-ee-stage2
     PUBLIC
         -T${CMAKE_CURRENT_BINARY_DIR}/linkfile
 )
@@ -62,18 +53,18 @@ target_link_options(fruitchip-loader-ee-stage1
 # endregion: linkfile
 
 add_custom_command(
-    TARGET fruitchip-loader-ee-stage1
+    TARGET fruitchip-loader-ee-stage2
     POST_BUILD
     COMMAND
         ${CMAKE_OBJCOPY}
         -O binary
         -v
-        $<TARGET_FILE:fruitchip-loader-ee-stage1>
-        $<TARGET_FILE_BASE_NAME:fruitchip-loader-ee-stage1>.bin
+        $<TARGET_FILE:fruitchip-loader-ee-stage2>
+        $<TARGET_FILE_BASE_NAME:fruitchip-loader-ee-stage2>.bin
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 install(
-    FILES $<TARGET_FILE:fruitchip-loader-ee-stage1>.bin
+    FILES $<TARGET_FILE:fruitchip-loader-ee-stage2>.bin
     DESTINATION ${CMAKE_INSTALL_PREFIX}
 )

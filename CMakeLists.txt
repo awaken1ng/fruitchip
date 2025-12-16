@@ -28,8 +28,8 @@ message("BUILD_ARM ${BUILD_ARM}")
 
 if(BUILD_PS2)
     ExternalProject_Add(
-        fruitchip-loader
-        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-loader"
+        fruitchip-loader-ee
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fruitchip-loader/ee"
         CMAKE_ARGS
             -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
             -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
@@ -125,7 +125,7 @@ if(BUILD_ARM)
     )
 
     if(BUILD_PS2)
-        ExternalProject_Add_StepDependencies(fruitchip-fw build fruitchip-loader)
+        ExternalProject_Add_StepDependencies(fruitchip-fw build fruitchip-loader-ee)
         ExternalProject_Add_StepDependencies(fruitchip-fw build fruitchip-menu)
     endif()
 
@@ -149,7 +149,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
     if(BUILD_PS2)
         append_to_compilation_databases(fruitchip-fwfs)
         append_to_compilation_databases(fruitchip-menu)
-        append_to_compilation_databases(fruitchip-loader)
+        append_to_compilation_databases(fruitchip-loader-ee)
         append_to_compilation_databases(masswatch-iop)
         append_to_compilation_databases(masswatch-ee)
         append_to_compilation_databases(fruitchip-test-ps2)
