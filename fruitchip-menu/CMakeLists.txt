@@ -14,6 +14,8 @@ set(IS_RELEASE_BUILD CMAKE_BUILD_TYPE MATCHES "^Release")
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
 add_executable(fruitchip-menu
+    ${CMAKE_CURRENT_BINARY_DIR}/include/font/dejavu_sans_mono.h
+
     src/components/button_guide.c
     src/components/font.c
     src/components/list.c
@@ -136,22 +138,21 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(
-    font-dejavu-sans-mono
-    DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa.fnt
-        ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa_0.png
+add_custom_command(
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/include/font/dejavu_sans_mono.h
     COMMAND
         python
         tools/convert_bmfont.py
         ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa.fnt # fnt
         ${CMAKE_CURRENT_BINARY_DIR}/res                                   # embed_path_root
         ${CMAKE_CURRENT_BINARY_DIR}/include/font/dejavu_sans_mono.h       # out_path
+    DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa.fnt
+        ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa_0.png
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
-add_dependencies(fruitchip-menu font-dejavu-sans-mono)
 
 # endregion: font
 
