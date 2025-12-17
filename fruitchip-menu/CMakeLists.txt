@@ -134,6 +134,8 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/res/dejavu-sans-mono-19px-bold-aa_0.png
     COMMAND
         ${ACBMFONT}
+    DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/dejavu-sans-mono-19px-bold-aa.bmfc
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
