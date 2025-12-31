@@ -10,6 +10,11 @@ static void __time_critical_func(reset_pressed)(uint gpio, uint32_t event_mask)
 
     if (event_mask & GPIO_IRQ_EDGE_FALL)
     {
+        last_reset_us = time_us_64();
+    }
+
+    if (event_mask & GPIO_IRQ_EDGE_RISE)
+    {
         uint64_t now_us = time_us_64();
         uint64_t diff_us = now_us - last_reset_us;
 
@@ -18,11 +23,6 @@ static void __time_critical_func(reset_pressed)(uint gpio, uint32_t event_mask)
             watchdog_reboot(0, 0, 0);
             last_reset_us = time_us_64();
         }
-    }
-
-    if (event_mask & GPIO_IRQ_EDGE_RISE)
-    {
-        last_reset_us = time_us_64();
     }
 }
 
