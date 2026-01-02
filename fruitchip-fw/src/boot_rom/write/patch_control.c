@@ -3,12 +3,13 @@
 #include <modchip/errno.h>
 #include <modchip/cmd.h>
 
-#include <boot_rom/write/disable_next_osdsys_hook.h>
+#include <boot_rom/write/patch_control.h>
 #include <boot_rom/write/idle.h>
 #include <boot_rom/data_out.h>
 #include <boot_rom/handler.h>
 
 bool disable_next_osdsys_hook = false;
+bool disable_next_iopboot_hook = true;
 
 void __time_critical_func(handle_write_disable_next_osdsys_hook)(uint8_t w)
 {

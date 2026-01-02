@@ -23,3 +23,7 @@ const uint8_t __in_flash("ee_stage3") LOADER_EE_STAGE_3[] = {
 };
 
 const uint32_t LOADER_EE_STAGE_3_SIZE = sizeof(LOADER_EE_STAGE_3);
+
+const uint8_t __not_in_flash("iop_stage1") LOADER_IOP_STAGE_1[] = {};
+
+const uint32_t LOADER_IOP_STAGE_1_SIZE = sizeof(LOADER_IOP_STAGE_1);

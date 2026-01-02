@@ -4,7 +4,7 @@
 #include <boot_rom/handler.h>
 #include "boot_rom/write/idle.h"
 #include "boot_rom/write/configuration.h"
-#include "boot_rom/write/disable_next_osdsys_hook.h"
+#include "boot_rom/write/patch_control.h"
 #include "boot_rom/write/get_payload.h"
 #include "boot_rom/write/read_app.h"
 #include "boot_rom/write/kv.h"

@@ -28,9 +28,10 @@ add_executable(fruitchip-fw
     src/boot_rom/data_out.c
     ${CMAKE_CURRENT_BINARY_DIR}/src/boot_rom/loader.c
     src/boot_rom/read/idle.c
+    src/boot_rom/read/iopboot.c
     src/boot_rom/read/osdsys.c
     src/boot_rom/write/configuration.c
-    src/boot_rom/write/disable_next_osdsys_hook.c
+    src/boot_rom/write/patch_control.c
     src/boot_rom/write/flash.c
     src/boot_rom/write/get_payload.c
     src/boot_rom/write/idle.c

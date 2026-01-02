@@ -5,7 +5,7 @@
 #include <boot_rom/loader.h>
 #include <boot_rom/read/idle.h>
 #include <boot_rom/read/osdsys.h>
-#include <boot_rom/write/disable_next_osdsys_hook.h>
+#include <boot_rom/write/patch_control.h>
 #include <led_color.h>
 
 static uint32_t counter = 0;

@@ -2,6 +2,7 @@
 
 #include <boot_rom/read/idle.h>
 #include <boot_rom/read/osdsys.h>
+#include <boot_rom/read/iopboot.h>
 #include <boot_rom/handler.h>
 
 void __time_critical_func(handle_read_idle)(uint8_t r)
@@ -9,5 +10,6 @@ void __time_critical_func(handle_read_idle)(uint8_t r)
     switch (r)
     {
         case 0x7F: read_handler = handle_read_find_osdsys_elf; break;
+        case 0x07: read_handler = handle_read_find_iopboot; break;
     }
 }
