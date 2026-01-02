@@ -46,7 +46,7 @@ if(BUILD_PS2)
         CMAKE_ARGS
             -DBOARD=${BOARD}
             -DPICO_PLATFORM=host
-        INSTALL_COMMAND cmake -E true
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E true
         BUILD_ALWAYS 1
     )
 
@@ -104,7 +104,7 @@ if(BUILD_PS2)
             -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
             -DCMAKE_TOOLCHAIN_FILE=$ENV{PS2SDK}/ps2dev.cmake
             -DFWFS_INSTALL_PREFIX=${FWFS_INSTALL_PREFIX}
-        INSTALL_COMMAND cmake -E true
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E true
         BUILD_ALWAYS 1
     )
 endif()
@@ -118,7 +118,7 @@ if(BUILD_ARM)
             -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
             -DLOADER_INSTALL_PREFIX=${LOADER_INSTALL_PREFIX}
             -DMENU_INSTALL_PREFIX=${MENU_INSTALL_PREFIX}
-        INSTALL_COMMAND cmake -E true
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E true
         # helps to avoid reconfiguring the project due to rebuilding loader, even if there were no changes
         CONFIGURE_HANDLED_BY_BUILD 1
         BUILD_ALWAYS 1
@@ -135,7 +135,7 @@ if(BUILD_ARM)
         CMAKE_ARGS
             -DBOARD=${BOARD}
             -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
-        INSTALL_COMMAND cmake -E true
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E true
         BUILD_ALWAYS 1
     )
 endif()
