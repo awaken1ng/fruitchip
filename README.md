@@ -72,7 +72,10 @@ For example, for Modbo 4.0 and RP2040-Tiny:
 ## Loader
 | Color | Meaning |
 |-----|--------|
-| ![700000](https://img.shields.io/badge/-700000?style=for-the-badge) | Read failed: modchip did not respond or checksum did not match |
+| ![700000](https://img.shields.io/badge/-700000?style=for-the-badge) | Stage 1 failed: modchip command failed |
+| ![000070](https://img.shields.io/badge/-000070?style=for-the-badge) | Stage 1 failed: checksum did not match |
+| ![007000](https://img.shields.io/badge/-007000?style=for-the-badge) | Stage 2 failed: failed to execute stage 3 |
+
 
 ## RGB LED
 
@@ -82,7 +85,7 @@ For example, for Modbo 4.0 and RP2040-Tiny:
 | ![FF0000](https://img.shields.io/badge/-FF0000?style=for-the-badge) | Apps partition header not found |
 | ![00FF00](https://img.shields.io/badge/-00FF00?style=for-the-badge) | Ok                              |
 | ![0000FF](https://img.shields.io/badge/-0000FF?style=for-the-badge) | Settings failed to initialize   |
-| ![00FFFF](https://img.shields.io/badge/-00FFFF?style=for-the-badge) | Unused                          |
+| ![00FFFF](https://img.shields.io/badge/-00FFFF?style=for-the-badge) | OSDSYS hook succeeded           |
 | ![FF00FF](https://img.shields.io/badge/-FF00FF?style=for-the-badge) | Unused                          |
 | ![FFFFFF](https://img.shields.io/badge/-FFFFFF?style=for-the-badge) | Unused                          |
 
