@@ -12,7 +12,7 @@
     out pindirs, 8 side 0 // set OUT (Q0-Q7) to 0 (input), SIDE (LED) to 0 (off)
 .wrap_target
 ce_high:
-    wait 0 gpio ${BOOT_ROM_OE_PIN} [5] // 20.83 ns @ 240 MHz
+    wait 0 gpio ${BOOT_ROM_OE_PIN} [6] // ~25 ns @ 240 MHz
     jmp pin ce_high
 ce_low:
     in pins, 8
@@ -25,7 +25,7 @@ ce_low:
     out pindirs, 8 // set OUT (Q0-Q7) to 0 (input)
 .wrap_target
 ce_high:
-    wait 0 gpio ${BOOT_ROM_OE_PIN} [5] // 20.83 ns @ 240 MHz
+    wait 0 gpio ${BOOT_ROM_OE_PIN} [6] // ~25 ns @ 240 MHz
     jmp pin ce_high
 ce_low:
     in pins, 8
