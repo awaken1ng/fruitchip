@@ -14,10 +14,17 @@
 #define print_debug(str)
 #endif
 
-inline static void panic(const char *msg)
+inline static void panic(const char *msg, uint8_t panic_type)
 {
     print_debug(msg);
-    GS_SET_BGCOLOR(0x70, 0x00, 0x00);
+    switch(panic_type) {
+    case 0:
+        GS_SET_BGCOLOR(0x70, 0x00, 0x00);
+        break;
+    case 1:
+        GS_SET_BGCOLOR(0x00, 0x00, 0x70);
+        break;
+    }
     asm volatile("break\n");
 }
 
@@ -32,8 +39,8 @@ inline static void modchip_cmd_or_panic(u32 cmd)
         if (ret == MODCHIP_CMD_RESULT_OK) break;
     }
 
-    if (ret == BOOT_ROM_ADDR_VALUE) panic("EE1: cmd no response");
-    if (ret != MODCHIP_CMD_RESULT_OK) panic("EE1: cmd bad crc");
+    if (ret == BOOT_ROM_ADDR_VALUE) panic("EE1: cmd no response", 0);
+    if (ret != MODCHIP_CMD_RESULT_OK) panic("EE1: cmd bad crc", 0);
 }
 
 void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int argc, char** argv)
@@ -57,7 +64,7 @@ void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int arg
     sio_putxn(crc);
     if (crc == ee_stage1_crc) sio_puts(" ok");
 #endif
-    if (crc != ee_stage1_crc) panic(" bad");
+    if (crc != ee_stage1_crc) panic(" bad", 1);
 
     modchip_cmd_or_panic(MODCHIP_CMD_GET_EE_STAGE2_SIZE);
     u32 ee_stage2_size = modchip_peek_u32();
@@ -72,7 +79,7 @@ void __attribute__((section(".entry"))) __ExecPS2(void* entry, void* gp, int arg
     sio_putxn(crc);
     if (crc == ee_stage2_crc) sio_puts(" ok");
 #endif
-    if (crc != ee_stage2_crc) panic(" bad");
+    if (crc != ee_stage2_crc) panic(" bad", 1);
 
     FlushCache(0); // flush data cache
     FlushCache(2); // invalidate instruction cache

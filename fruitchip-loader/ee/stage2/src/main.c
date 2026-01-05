@@ -26,7 +26,7 @@ DISABLE_PATCHED_FUNCTIONS();
 inline static void panic(const char *msg)
 {
     print_debug(msg);
-    GS_SET_BGCOLOR(0x70, 0x00, 0x00);
+    GS_SET_BGCOLOR(0x00, 0x70, 0x00);
     asm volatile("break\n");
 }
 
