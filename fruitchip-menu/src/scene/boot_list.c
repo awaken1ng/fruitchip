@@ -33,7 +33,6 @@
 static void boot_osdsys(struct state *state)
 {
     modchip_cmd_with_retry(MODCHIP_CMD_DISABLE_NEXT_OSDSYS_HOOK, MODCHIP_CMD_RETRIES);
-    SifExitCmd();
 
     int argc = 0;
     char *argv[4];
@@ -41,7 +40,7 @@ static void boot_osdsys(struct state *state)
     if (state->osdsys.field.boot_browser) argv[argc++] = "BootBrowser";
     if (state->osdsys.field.skip_mc_update) argv[argc++] = "SkipMc";
     if (state->osdsys.field.skip_hdd_update) argv[argc++] = "SkipHdd";
-    ExecOSD(argc, argv);
+    LoadELFFromFile("rom0:OSDSYS", argc, argv);
 }
 
 static void boot_fwfs(struct state *state)
