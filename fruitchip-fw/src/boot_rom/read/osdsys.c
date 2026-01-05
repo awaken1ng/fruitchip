@@ -1,11 +1,12 @@
 #include <pico/platform/sections.h>
 
-#include <boot_rom/read/idle.h>
-#include <boot_rom/read/osdsys.h>
-#include <boot_rom/write/disable_next_osdsys_hook.h>
 #include <boot_rom/data_out.h>
 #include <boot_rom/handler.h>
 #include <boot_rom/loader.h>
+#include <boot_rom/read/idle.h>
+#include <boot_rom/read/osdsys.h>
+#include <boot_rom/write/disable_next_osdsys_hook.h>
+#include <led_color.h>
 
 static uint32_t counter = 0;
 static uint32_t bytes_read = 0;
@@ -13,119 +14,155 @@ static uint32_t bytes_read = 0;
 void handle_read_find_hook_osdsys(uint8_t);
 void handle_read_find_osdsys_elf(uint8_t);
 
-void __time_critical_func(handle_read_hook_osdsys)(uint8_t r)
+void __time_critical_func(inject_osdhook)()
 {
-    // 06 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00[00]
-    // 07 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00 00
-
-    if (r != 0x00)
-    {
-        read_handler = handle_read_find_hook_osdsys;
-        return;
-    }
-
+    // Injects stage 1 code if not explicitly disabled
     if (!disable_next_osdsys_hook)
         boot_rom_data_out_start_data_without_status_code(true);
 
-    read_handler = handle_read_find_osdsys_elf;
+    // Reset to the idle handler and set LED to indicate that the hook was successful
+    read_handler = handle_read_idle;
     disable_next_osdsys_hook = false;
+    counter = 0;
+    bytes_read = 0;
+    colored_status_led_set_on_with_color(RGB_OK_OSDHOOK);
 }
 
 void __time_critical_func(handle_read_find_osdsys_syscall_table)(uint8_t r)
 {
-    counter += 1;
-
-    //     1  2  3   4  5  6  7   8  9 10 11  12 13 14 15
+    // The hook payload (stage 1) must be injected at this part of the syscall table, at syscall 0x7 (ExecPS2):
+    //  0  1  2  3   4  5  6  7   8  9 10 11  12 13 14 15
     // --------------------------------------------------
-    // 06 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00 00
+    // 06 00 03 24  0C 00 00 00  08 00 E0 03  00 00[00]00
     // 07 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00 00
-
+    counter += 1;
     switch (counter)
     {
-        case 1: if (r != 0x00) { goto exit; } break;
-        case 2: if (r != 0x03) { goto exit; } break;
-        case 3: if (r != 0x24) { goto exit; } break;
-
-        case 4: if (r != 0x0C) { goto exit; } break;
-        case 5:
-        case 6:
-        case 7: if (r != 0x00) { goto exit; } break;
-
-        case 8: if (r != 0x08) { goto exit; } break;
-        case 9: if (r != 0x00) { goto exit; } break;
-        case 10: if (r != 0xE0) { goto exit; } break;
-        case 11: if (r != 0x03) { goto exit; }
-            // setup data out early
-            // helps avoding delay with data out start on cold boot
-            boot_rom_data_out_set_data(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE);
-            break;
-
-        case 12:
-        case 13: if (r != 0x00) { goto exit; } break;
-        case 14: if (r != 0x00) { goto exit; }
-            // move injection handler into it's own function,
-            // otherwise, if kept here, injection becomes unreliable
-            // (switch case getting too big?)
-            read_handler = handle_read_hook_osdsys;
-            counter = 0;
-            break;
-
-exit:
-        default:
-            read_handler = handle_read_find_hook_osdsys;
-            counter = 0;
+    case 14:
+        if (r != 0x00)
+            goto reset;
+        // Inject 1 byte earlier to avoid timing issues
+        inject_osdhook();
+        return;
+    case 11:
+        if (r != 0x03)
+            goto reset;
+        // Setup data out early to avoid delay with data out start on cold boot
+        boot_rom_data_out_set_data(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE);
+        break;
+    case 2:
+        if (r != 0x03)
+            goto reset;
+        break;
+    case 3:
+        if (r != 0x24)
+            goto reset;
+        break;
+    case 4:
+        if (r != 0x0C)
+            goto reset;
+        break;
+    case 8:
+        if (r != 0x08)
+            goto reset;
+        break;
+    case 10:
+        if (r != 0xE0)
+            goto reset;
+        break;
     }
+    return;
+
+reset:
+    read_handler = handle_read_find_hook_osdsys;
+    counter = 0;
 }
 
 void __time_critical_func(handle_read_find_hook_osdsys)(uint8_t r)
 {
-    bytes_read += 1;
-
+    // This function looks for the first byte of the 0x6 syscall in the syscall table
     if (bytes_read >= 1024)
     {
-        // failed to find the syscall table
-        read_handler = handle_read_find_osdsys_elf;
+        // Failed to find the syscall table, return to the idle handler
+        bytes_read = 0;
+        read_handler = handle_read_idle;
     }
     else if (r == 0x06)
-    {
         read_handler = handle_read_find_osdsys_syscall_table;
-    }
 }
 
 void __time_critical_func(handle_read_find_osdsys_elf)(uint8_t r)
 {
-    counter += 1;
-
+    // This function looks for the beginning of the OSDSYS ELF header:
+    // 7F 45 4C 46 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
+    // ?? ?? ?? ?? ?? ?? ?? ?? 08 00 10 00 ?? ?? ?? ??
+    // ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
+    // 08 00 07 00
     switch (counter)
     {
-        case 1: if (r != 0x7F) { goto exit; } break;
-        case 2: if (r != 0x45) { goto exit; } break; // E
-        case 3: if (r != 0x4C) { goto exit; } break; // L
-        case 4: if (r != 0x46) { goto exit; } break; // F
+    // ELF magic (0x7F454C46), 0x7F is processed by the handle_read_idle function
+    case 0:
+        if (r != 0x45)
+            goto reset;
+        break; // E
+    case 1:
+        if (r != 0x4C)
+            goto reset;
+        break; // L
+    case 2:
+        if (r != 0x46)
+            goto reset;
+        break; // F
 
-        // e_entry
-        case 25: if (r != 0x08) { goto exit; } break;
-        case 26: if (r != 0x00) { goto exit; } break;
-        case 27: if (r != 0x10) { goto exit; } break;
-        case 28: if (r != 0x00) { goto exit; } break;
+    // e_entry (0x100008)
+    case 23:
+        if (r != 0x08)
+            goto reset;
+        break;
+    case 24:
+        if (r != 0x00)
+            goto reset;
+        break;
+    case 25:
+        if (r != 0x10)
+            goto reset;
+        break;
+    case 26:
+        if (r != 0x00)
+            goto reset;
+        break;
 
-        // e_shnum
-        case 49: if (r != 0x08) { goto exit; } break;
-        case 50: if (r != 0x00) { goto exit; } break;
+    // e_shnum (0x0008)
+    case 47:
+        if (r != 0x08)
+            goto reset;
+        break;
+    case 48:
+        if (r != 0x00)
+            goto reset;
+        break;
 
-        // e_shstrndx
-        case 51: if (r != 0x07) { goto exit; } break;
-        case 52: if (r != 0x00) { goto exit; }
-            read_handler = handle_read_find_hook_osdsys;
-            bytes_read = 0;
-            counter  = 0;
-            break;
+    // e_shstrndx (0x0007)
+    case 49:
+        if (r != 0x07)
+            goto reset;
+        break;
+    case 50:
+        if (r != 0x00)
+            goto reset;
 
-exit:
-        default:
-            if (counter >= 5 && counter <= 24) {} // skip to e_entry
-            else if (counter >= 29 && counter <= 48) {} // skip to e_shnum
-            else counter = 0;
+        // Full match, switch to the next read handler
+        counter = 0;
+        read_handler = handle_read_find_osdsys_syscall_table;
+        return;
     }
-}
 
+    if ((r == 0x7F) || (counter > 52))
+        goto reset;
+
+    counter += 1;
+    return;
+
+reset:
+    counter = 0;
+}
