@@ -22,7 +22,8 @@ inline static void panic(const char *msg, uint8_t panic_type)
         GS_SET_BGCOLOR(0x70, 0x00, 0x00);
         break;
     case 1:
-        GS_SET_BGCOLOR(0x00, 0x00, 0x70);
+        // On actual hardware, 0x30 is a closer match to 0x70 specified in the README
+        GS_SET_BGCOLOR(0x00, 0x00, 0x30);
         break;
     }
     asm volatile("break\n");

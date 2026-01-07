@@ -26,7 +26,8 @@ DISABLE_PATCHED_FUNCTIONS();
 inline static void panic(const char *msg)
 {
     print_debug(msg);
-    GS_SET_BGCOLOR(0x00, 0x70, 0x00);
+    // On actual hardware, 0x40 is a closer match to 0x70 specified in the README
+    GS_SET_BGCOLOR(0x00, 0x40, 0x00);
     asm volatile("break\n");
 }
 
