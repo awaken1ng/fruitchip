@@ -45,9 +45,7 @@ void __time_critical_func(handle_read_find_osdsys_syscall_table)(uint8_t r)
             break;
         case 508: // 00, byte 15
             // Missed the injection window
-            read_handler = handle_read_idle;
-            counter = 0;
-            break;
+            goto reset;
     }
     return;
 
