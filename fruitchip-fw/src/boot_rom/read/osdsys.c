@@ -61,46 +61,47 @@ void __time_critical_func(handle_read_find_osdsys_elf)(uint8_t r)
     // ?? ?? ?? ?? ?? ?? ?? ?? 08 00 10 00 ?? ?? ?? ??
     // ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
     // 08 00 07 00
+    counter += 1;
     switch (counter)
     {
         // ELF magic (0x7F454C46), 0x7F is processed by the handle_read_idle function
-        case 0:
+        case 1:
             if (r != 0x45) goto reset;
             break; // E
-        case 1:
+        case 2:
             if (r != 0x4C) goto reset;
             break; // L
-        case 2:
+        case 3:
             if (r != 0x46) goto reset;
             break; // F
 
         // e_entry (0x100008)
-        case 23:
+        case 24:
             if (r != 0x08) goto reset;
             break;
-        case 24:
+        case 25:
             if (r != 0x00) goto reset;
             break;
-        case 25:
+        case 26:
             if (r != 0x10) goto reset;
             break;
-        case 26:
+        case 27:
             if (r != 0x00) goto reset;
             break;
 
         // e_shnum (0x0008)
-        case 47:
+        case 48:
             if (r != 0x08) goto reset;
             break;
-        case 48:
+        case 49:
             if (r != 0x00) goto reset;
             break;
 
         // e_shstrndx (0x0007)
-        case 49:
+        case 50:
             if (r != 0x07) goto reset;
             break;
-        case 50:
+        case 51:
             if (r != 0x00) goto reset;
 
             // Full match, switch to the next read handler
@@ -109,10 +110,9 @@ void __time_critical_func(handle_read_find_osdsys_elf)(uint8_t r)
             return;
     }
 
-    if ((r == 0x7F) || (counter > 52))
+    if ((r == 0x7F) || (counter > 51))
         goto reset;
 
-    counter += 1;
     return;
 
 reset:
