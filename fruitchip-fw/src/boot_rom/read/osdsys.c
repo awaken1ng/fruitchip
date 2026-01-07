@@ -10,45 +10,34 @@
 
 static uint32_t counter = 0;
 
-void __time_critical_func(inject_osdhook)()
-{
-    // Injects stage 1 code if not explicitly disabled
-    if (!disable_next_osdsys_hook)
-        boot_rom_data_out_start_data_without_status_code(true);
-
-    // Reset to the idle handler and set LED to indicate that the hook was successful
-    read_handler = handle_read_idle;
-    disable_next_osdsys_hook = false;
-    counter = 0;
-    colored_status_led_set_on_with_color(RGB_OK_OSDHOOK);
-}
-
 void __time_critical_func(handle_read_find_osdsys_syscall_table)(uint8_t r)
 {
     // The hook payload (stage 1) must be injected at this part of the syscall table, at syscall 0x7 (ExecPS2):
     //  0  1  2  3   4  5  6  7   8  9 10 11  12 13 14 15
     // --------------------------------------------------
-    // 06 00 03 24  0C 00 00 00  08 00 E0 03  00 00[00]00
+    // 06 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00[00]
     // 07 00 03 24  0C 00 00 00  08 00 E0 03  00 00 00 00
     counter += 1;
     switch (counter)
     {
-        case 507: // 00, byte 14
+        case 508: // 00, byte 15
+            // Inject the stage 1 payload
             if (r != 0x00) goto reset;
-            // Inject 1 byte earlier to avoid timing issues
-            inject_osdhook();
-            break;
-        case 504: // 03, byte 11
-            if (r != 0x03) goto reset;
+            boot_rom_data_out_start_data_without_status_code(true);
+            goto success;
+        case 503: // E0, byte 10
+            if (r != 0xE0) goto reset;
+            if (disable_next_osdsys_hook) goto skip; // Skip the injection
             // Setup data out early to avoid delay with data out start on cold boot
             boot_rom_data_out_set_data(LOADER_EE_STAGE_1, LOADER_EE_STAGE_1_SIZE);
             break;
-        case 508: // 00, byte 15
-            // Missed the injection window
-            goto reset;
     }
     return;
 
+success:
+    colored_status_led_set_on_with_color(RGB_OK_OSDHOOK);
+skip:
+    disable_next_osdsys_hook = false;
 reset:
     read_handler = handle_read_idle;
     counter = 0;
